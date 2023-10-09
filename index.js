@@ -1,19 +1,3 @@
-/** 
-function updateCurrentClass() {
-	const currentElements = document.querySelectorAll(".w--current");
-    currentElements.forEach(function (element) {
-      element.classList.remove("w--current");
-    });
-
-    const navLinks = document.querySelectorAll(".navbar__wrapper a");
-    navLinks.forEach(function (link) {
-      if (link.getAttribute("href") === window.location.pathname) {
-        link.classList.add("w--current");
-      }
-    });
-}
-*/
-
 /** LOADING */
 function loading() {
 	if(document.querySelector('.loading')) {
@@ -163,6 +147,15 @@ function iframePoster() {
       iframeEl.style.opacity = 1;
     });
 	})
+}
+
+function currentYear() {
+    let copyrightYear = document.querySelector('.copyright_year'),
+        currentYear = new Date().getFullYear();
+
+        alert('page change, copyright is:'+copyrightYear)
+
+    copyrightYear.textContent = currentYear;
 }
   
 /** HOMEPAGE */
