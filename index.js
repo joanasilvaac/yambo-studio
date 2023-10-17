@@ -71,6 +71,16 @@ function isTouchDevice() {
 function customCursors() {
   const cursors = document.querySelector('.cursor-wrapper');
   const customCursors = document.querySelectorAll('[data-cursor]');
+
+  document.querySelectorAll('a, button').forEach(element => {
+    element.addEventListener('mouseenter', () => {
+      cursors.style.opacity = '0';
+    });
+  
+    element.addEventListener('mouseleave', () => {
+      cursors.style.opacity = '1';
+    });
+  });
   
   if (!isTouchDevice()) {
     // Move the cursors with the mouse position
