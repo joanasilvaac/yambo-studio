@@ -1,7 +1,7 @@
 /* logo interaction */
 gsap.registerPlugin(SplitText);
 
-let text = new SplitText(".navbar__logo", { type: "chars" }),
+let text = new SplitText('.navbar__logo', { type: "chars" }),
   letters = text.chars;
 
 gsap.utils.toArray(letters).forEach(function(letter, index) {
@@ -78,7 +78,6 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
     }
   });
 });
-
 
 /** LOADING */
 function loading() {
