@@ -1,20 +1,107 @@
+/* logo interaction */
+gsap.registerPlugin(SplitText);
+
+let text = new SplitText(".navbar__logo", { type: "chars" }),
+  letters = text.chars;
+
+gsap.utils.toArray(letters).forEach(function(letter, index) {
+  letter.addEventListener('mouseenter', () =>{
+    gsap.to(letter, {
+      y: -3,
+      x: 2,
+      onStart: function() {
+        letter.classList.add('active');
+      },
+    })
+
+    //animate the previous letter if it exists
+    if (index > 0) {
+      const prevLetter = letters[index - 1];
+
+      gsap.to(prevLetter, {
+        y: -2,
+        x: 1,
+        onStart: function() {
+          prevLetter.classList.add('active');
+        },
+      });
+    }
+
+    //animate the next letter if it exists
+    if (index < letters.length - 1) {
+      const nextLetter = letters[index + 1];
+    
+      gsap.to(nextLetter, {
+        y: -2,
+        x: 1,
+        onStart: function() {
+          nextLetter.classList.add('active');
+        },
+      });
+    }
+  });
+
+  letter.addEventListener('mouseleave',  () =>{
+    //reset animation for the current letter
+    gsap.to(letter, {
+      y: 0,
+      x: 0,
+      onStart: function() {
+        letter.classList.remove('active');
+      },
+    });
+
+    //reset animation for the previous letter if it exists
+    if (index > 0) {
+      const prevLetter = letters[index - 1];
+      
+      gsap.to(prevLetter, {
+        y: 0,
+        x: 0,
+        onStart: function() {
+          prevLetter.classList.remove('active');
+        },
+      });
+    }
+
+    //reset animation for the next letter if it exists
+    if (index < letters.length - 1) {
+      const nextLetter = letters[index + 1];
+      
+      gsap.to(nextLetter, {
+        y: 0,
+        x: 0,
+        onStart: function() {
+          nextLetter.classList.remove('active');
+        },
+      });
+    }
+  });
+});
+
+
 /** LOADING */
 function loading() {
 	if(document.querySelector('.loading')) {
     const loadingInfo = document.querySelector('.loading-info'),
       loadingText = document.querySelector('.loading-text'),
       splitText = new SplitText(loadingText, { type: 'words,chars' }),
-      loadingPercentage = document.querySelector('.loading-percentage');
+      loadingPercentage = document.querySelector('.loading-percentage'), 
+      loadingBackground = document.querySelector('.loading-background');
 
     let chars = splitText.chars, 
       loadingTimeline = gsap.timeline();
 
     gsap.set(loadingInfo, { opacity: 1} );
 
-    loadingTimeline.from(chars, {
-      duration: 0.05,
+    loadingTimeline.to(loadingBackground, {
+      y: 0,
+      duration: 0.6, 
+      ease: Power1.easeOut 
+    }).from(chars, {
+      duration: 0.03,
       opacity: 0,
-      stagger: 0.15
+      stagger: 0.05
     }).fromTo(loadingPercentage,   
       {  opacity: 0  }, 
       { 
@@ -27,7 +114,7 @@ function loading() {
       },
       {
         textContent: '100%',
-        duration: 7,
+        duration: 5,
         ease: 'none',
         onUpdate: () => {
           currentPercentage = Math.round(gsap.getProperty(loadingPercentage, 'textContent'));
@@ -39,10 +126,12 @@ function loading() {
       duration: 1,
       delay: 0.6, 
       ease: Power2.easeOut,
+    }).to(loadingBackground, {
+      yPercent: -100, 
+      duration: 0.6, 
+      ease: Power1.easeOut 
     }).to('.loading', {
-      autoAlpha: 0, 
-      duration: 1,
-      ease: Power2.easeOut,
+      display: 'none'
     });
   }
 }
