@@ -1,3 +1,54 @@
+/* Smooth scroll */
+const lenis = new Lenis();
+
+function raf(time) {
+  lenis.raf(time)
+  requestAnimationFrame(raf)
+}
+
+requestAnimationFrame(raf);
+
+
+// /* Page interactions */
+// gsap.registerPlugin(ScrollTrigger);
+// gsap.registerPlugin(SplitText);
+
+// lenis.on('scroll', ScrollTrigger.update);
+
+// const revealClients = gsap.utils.toArray('.hero__clients-collection');
+
+// revealClients.forEach((target) => {
+//   const splitLines = new SplitText(target, {
+//     type: 'lines',
+//     linesClass: 'line line++'
+//   });
+
+//   gsap.from(splitLines.lines, {
+//     yPercent: 100,
+//     opacity: 0,
+//     duration: 1,
+//     stagger: 0.15,
+//     ease: 'power4',
+//   });
+// });
+
+// const revealOpacity = document.querySelectorAll("[data-reveal='opacity']")
+
+// revealOpacity.forEach((el) => {
+//   console.log(el)
+//   gsap.from(el, {
+//     opacity: 0,
+//     duration: 0.8,
+//     ease: 'power4',
+//     scrollTrigger: {
+//       trigger: el,
+//       start: 'top bottom-=150',
+//       end: 'bottom bottom',
+//       //markers: true
+//     }
+//   });
+// });
+
 /* logo interaction */
 gsap.registerPlugin(SplitText);
 
@@ -9,6 +60,7 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
     gsap.to(letter, {
       y: -3,
       x: 2,
+      duration: 0.2,
       onStart: function() {
         letter.classList.add('active');
       },
@@ -21,10 +73,24 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
       gsap.to(prevLetter, {
         y: -2,
         x: 1,
+        duration: 0.2,
         onStart: function() {
           prevLetter.classList.add('active');
         },
       });
+
+      //animate the 2nd previous letter if it exists
+      if (index > 1) {
+        const prevLetter2 = letters[index - 2];
+        gsap.to(prevLetter2, {
+          y: -1,
+          x: 0,
+          duration: 0.2,
+          onStart: function() {
+            prevLetter2.classList.add('active');
+          },
+        });
+      }
     }
 
     //animate the next letter if it exists
@@ -34,10 +100,24 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
       gsap.to(nextLetter, {
         y: -2,
         x: 1,
+        duration: 0.2,
         onStart: function() {
           nextLetter.classList.add('active');
         },
       });
+
+      //animate the 2nd next letter if it exists
+      if (index < letters.length - 2) {
+        const nextLetter2 = letters[index + 2];
+        gsap.to(nextLetter2, {
+          y: -1,
+          x: 0,
+          duration: 0.2,
+          onStart: function() {
+            nextLetter2.classList.add('active');
+          },
+        });
+      }
     }
   });
 
@@ -46,6 +126,7 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
     gsap.to(letter, {
       y: 0,
       x: 0,
+      duration: 0.2,
       onStart: function() {
         letter.classList.remove('active');
       },
@@ -54,14 +135,28 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
     //reset animation for the previous letter if it exists
     if (index > 0) {
       const prevLetter = letters[index - 1];
-      
+    
       gsap.to(prevLetter, {
         y: 0,
         x: 0,
+        duration: 0.2,
         onStart: function() {
           prevLetter.classList.remove('active');
         },
       });
+
+      //reset animation for the 2nd previous letter if it exists
+      if (index > 1) {
+        const prevLetter2 = letters[index - 2];
+        gsap.to(prevLetter2, {
+          y: 0,
+          x: 0,
+          duration: 0.2,
+          onStart: function() {
+            prevLetter2.classList.remove('active');
+          },
+        });
+      }
     }
 
     //reset animation for the next letter if it exists
@@ -71,10 +166,24 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
       gsap.to(nextLetter, {
         y: 0,
         x: 0,
+        duration: 0.2,
         onStart: function() {
           nextLetter.classList.remove('active');
         },
       });
+
+      //reset animation for the 2nd next letter if it exists
+      if (index < letters.length - 2) {
+        const nextLetter2 = letters[index + 2];
+        gsap.to(nextLetter2, {
+          y: 0,
+          x: 0,
+          duration: 0.2,
+          onStart: function() {
+            nextLetter2.classList.remove('active');
+          },
+        });
+      }
     }
   });
 });
