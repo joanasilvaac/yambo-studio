@@ -8,7 +8,6 @@ function raf(time) {
 
 requestAnimationFrame(raf);
 
-
 // /* Page interactions */
 // gsap.registerPlugin(ScrollTrigger);
 // gsap.registerPlugin(SplitText);
@@ -350,8 +349,8 @@ function iframePoster() {
     let player = new Vimeo.Player(iframeEl);
 
     player.on("play", function() {
-      componentEl.querySelector('.vimeo-wrapper').style.backgroundImage = 'none';
       iframeEl.style.opacity = 1;
+      componentEl.querySelector('.vimeo-wrapper').style.backgroundImage = 'transparent';
     });
 	})
 }
