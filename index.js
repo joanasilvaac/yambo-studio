@@ -189,56 +189,78 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
 
 /** LOADING */
 function loading() {
-	if(document.querySelector('.loading')) {
+  if (document.querySelector('.loading')) {
     const loadingInfo = document.querySelector('.loading-info'),
       loadingText = document.querySelector('.loading-text'),
       splitText = new SplitText(loadingText, { type: 'words,chars' }),
-      loadingPercentage = document.querySelector('.loading-percentage'), 
+      loadingPercentage = document.querySelector('.loading-percentage'),
       loadingBackground = document.querySelector('.loading-background');
 
-    let chars = splitText.chars, 
-      loadingTimeline = gsap.timeline();
+    let chars = splitText.chars,
+      loadingTimeline = gsap.timeline(),
+      initialPercentage = 0;
 
-    gsap.set(loadingInfo, { opacity: 1} );
+    gsap.set(loadingInfo, { opacity: 1 });
 
     loadingTimeline.to(loadingBackground, {
       y: 0,
-      duration: 0.6, 
-      ease: Power1.easeOut 
+      duration: 0.6,
+      ease: Power1.easeOut,
     }).from(chars, {
       duration: 0.03,
       opacity: 0,
-      stagger: 0.05
-    }).fromTo(loadingPercentage,   
-      {  opacity: 0  }, 
-      { 
-        opacity: 1,
-        duration: 0.2
-      }
-    ).fromTo(loadingPercentage,
-      {   
-        textContent: '0%',
-      },
+      stagger: 0.05,
+    }).fromTo(loadingPercentage,
+      { opacity: 0 },
       {
+        opacity: 1,
+        duration: 0.2,
+      }
+    );
+
+    function updatePercentage() {
+      if (initialPercentage < 100) {
+        initialPercentage += 1;
+        loadingPercentage.textContent = Math.floor(initialPercentage) + '%'; // Use Math.floor to round down to the nearest integer
+      }
+    }
+
+    const percentageInterval = setInterval(updatePercentage, 100);
+
+    // speed up the percentage animation when the 'load' event occurs
+    function finishLoadingAnimation() { 
+      const fastAnimationTimeline = gsap.timeline();
+      fastAnimationTimeline.to(loadingPercentage, {
         textContent: '100%',
-        duration: 5,
+        duration: 0.5, // will take 0.5s to finish the animation
         ease: 'none',
         onUpdate: () => {
           currentPercentage = Math.round(gsap.getProperty(loadingPercentage, 'textContent'));
           loadingPercentage.textContent = currentPercentage + '%';
-        }
+        },
+      }).to(loadingInfo, {
+        opacity: 0,
+        duration: 0.6,
+        ease: Power2.easeOut,
+      }).to(loadingBackground, {
+        yPercent: -100,
+        duration: 0.6,
+        ease: Power1.easeOut,
+      }).to('.loading', {
+        display: 'none',
+      });
+    }
+
+    // set a timer to wait for 3 seconds, even if the 'load' event occurs earlier
+    setTimeout(() => {
+      if (loadFlag) {
+        clearInterval(percentageInterval);
+        finishLoadingAnimation();
       }
-    ).to(loadingInfo, {
-      opacity: 0, 
-      duration: 1,
-      delay: 0.6, 
-      ease: Power2.easeOut,
-    }).to(loadingBackground, {
-      yPercent: -100, 
-      duration: 0.6, 
-      ease: Power1.easeOut 
-    }).to('.loading', {
-      display: 'none'
+    }, 5000);
+
+    window.addEventListener('load', () => {
+      loadFlag = true; // set the flag to true when 'load' event occurs
     });
   }
 }
@@ -455,7 +477,15 @@ function projectsIndex() {
   let currentAsset;
 
   projects.forEach((el, index) => { //em cada item da lista 
+    let firstMouseMove = true;
+
     el.addEventListener('mousemove', function (e) { //no mousemove, mexe o asset container
+      if (firstMouseMove) {
+        assetContainer.style.top = '0';
+        assetContainer.style.left = '0';
+        firstMouseMove = false;
+      }
+
       assetContainer.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
     });
 
