@@ -387,58 +387,55 @@ function currentYear() {
 }
   
 /** HOMEPAGE */
-function homepageHeroDesktop() { 
+function homepageHeroDesktop() { //add hover state to clients hero
   if (window.matchMedia('(min-width: 992px)').matches) {
-    //add hover state to clients hero
     const clients = document.querySelectorAll('.hero__client-wrapper');
     
     clients.forEach((el) => {
       let clientName = el.querySelector('.hero__client-text[data-hover]');
 
-      if (clientName.getAttribute('data-hover') == 'Light') {
-        clientName.classList.add('hover-text-light');
-      } 
-
       let assetContainer = el.querySelector('.hero__client-background'), 
-        //iframe = assetContainer.querySelector('iframe'),
         video =  assetContainer.querySelector('video'),
-        isVideoPlaying = false;
+        loader = el.querySelector('.hero__client-loader'),
+        isVideoLoaded = false,
+        isMouseOver = false; //so videos dont play right away when they're ready, only when hovered
+
+      video.addEventListener('loadedmetadata', function() {
+        isVideoLoaded = true;
+        checkMouseOver(); //so video plays if the user is already hovering it
+      });
 
       el.addEventListener('mouseover', () => {
-        //assetContainer.querySelector('.vimeo-wrapper').style.backgroundImage = 'none';
-        assetContainer.style.opacity = 1;
-        video.style.opacity = 1;
-
-        video.play();
-        isVideoPlaying = true; 
-  
-        // if (iframe && iframe.dataset.videoId) {
-        //   iframe.src = iframe.dataset.src; 
-  
-        //   let player = new Vimeo.Player(iframe);
-  
-        //   player.on('play', function() {
-        //     assetContainer.querySelector('.vimeo-wrapper').style.backgroundImage = 'none';
-        //     iframe.style.opacity = 1;
-        //     isVideoPlaying = true; 
-        //   });
-  
-        //   player.play();
-        // }
+        isMouseOver = true; 
+        checkMouseOver();
       });
 
       el.addEventListener('mouseout', () => {
+        isMouseOver = false;
+        loader.style.opacity = 0;
+
         assetContainer.style.opacity = 0;
+        clientName.style.color = '#070707';
 
         video.pause();
-        isVideoPlaying = false;
-  
-        // if (iframe && iframe.dataset.videoId && isVideoPlaying) {
-        //   let player = new Vimeo.Player(iframe);
-        //   player.pause();
-        //   isVideoPlaying = false;
-        // }
       });
+
+      function checkMouseOver() {
+        if (isMouseOver) {  
+          if (!isVideoLoaded) { //if video is not loaded
+            loader.style.opacity = 1;
+          } else {
+            loader.style.opacity = 0; //video loaded, hide loader
+    
+            if (clientName.getAttribute('data-hover') === 'Light') {
+              clientName.style.color = '#f8f8f8';
+            }
+            
+            video.play();
+            assetContainer.style.opacity = 1;
+          }
+        }
+      }
     });
   }
 }
