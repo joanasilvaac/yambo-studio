@@ -6,13 +6,13 @@ function raf(time) {
   requestAnimationFrame(raf)
 }
 
+lenis.on('scroll', ScrollTrigger.update);
+
 requestAnimationFrame(raf);
 
 // /* Page interactions */
 // gsap.registerPlugin(ScrollTrigger);
 // gsap.registerPlugin(SplitText);
-
-// lenis.on('scroll', ScrollTrigger.update);
 
 // const revealClients = gsap.utils.toArray('.hero__clients-collection');
 
@@ -741,7 +741,46 @@ function stickyReturn() {
     }, 1000);
   }
 }
+
+function projectsNavigation() {
+  const currentUrl = window.location.href;
+  const currentSlug = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
  
+  $('<div />').load('/', function(data) {
+    let allProjects = $(data).find('.homepage__projects');
+    let currentProject = allProjects.find('[href$="' + currentSlug + '"]').closest('.projects-index'),
+      prevProject = allProjects.find('.projects-index').eq(currentProject.index() - 1),
+      prevAssets = allProjects.find('.project-index__assets').eq(currentProject.index() - 1),
+      nextProject = allProjects.find('.projects-index').eq(currentProject.index() + 1),
+      nextAssets = allProjects.find('.project-index__assets').eq(currentProject.index() + 1);
+
+    let prevTitle = prevProject.find('.project-info__title p:last-of-type').text(),
+      prevYear = prevProject.find('.project-info__year').text(), 
+      prevImage = prevAssets.find('img').attr('src'),
+      prevUrl = prevProject.find('.project-index__link').attr('href');
+
+    let nextTitle = nextProject.find('.project-info__title p:last-of-type').text(),
+      nextYear = nextProject.find('.project-info__year').text(), 
+      nextImage = nextAssets.find('img').attr('src'),
+      nextUrl = nextProject.find('.project-index__link').attr('href');
+
+    document.querySelector('.proj-others__wrapper[data-proj-others="prev"]').href = prevUrl;
+    document.querySelector('.proj-others__image[data-proj-others="prev"]').src = prevImage;
+    document.querySelector('.proj-others__name[data-proj-others="prev"]').innerHTML = prevTitle;
+    document.querySelector('.proj-others__year[data-proj-others="prev"]').innerHTML = prevYear;
+
+    document.querySelector('.proj-others__wrapper[data-proj-others="next"]').href = nextUrl;
+    document.querySelector('.proj-others__image[data-proj-others="next"]').src = nextImage;
+    document.querySelector('.proj-others__name[data-proj-others="next"]').innerHTML = nextTitle;
+    document.querySelector('.proj-others__year[data-proj-others="next"]').innerHTML = nextYear;    
+  });
+}
+
+function projectSrollAnimations() {
+  let captions = document.querySelectorAll('.proj-text-caption');
+}
+
+
 /** OBJECTS */
 function objectsHeroDesktop() { 
   if (window.matchMedia('(min-width: 992px)').matches) {
@@ -883,15 +922,21 @@ function objectsSwiper() {
     if ( breakpoint.matches === true ) {
 	    if ( objectsSwiper !== undefined ) objectsSwiper.destroy( true, true );
 	    return;
-    // else if a small viewport and single column layout needed
-    } else if ( breakpoint.matches === false ) {
-      // fire small viewport version of swiper
-      return enableSwiper();
+    } else if ( breakpoint.matches === false ) { // else if a small viewport and single column layout needed
+      const functionsToExecute = [enableSwiper, initialiseGSAPScrollTriggerPinningHorizontal];
+
+      functionsToExecute.forEach((func) => {
+        if (typeof func === 'function') {
+          func(); // Call the function
+        }
+      });
+      //return [enableSwiper, initialiseGSAPScrollTriggerPinningHorizontal]; // fire small viewport version of swiper
     }
   };
   
   const enableSwiper = function() {
     objectsSwiper = new Swiper('.objects-carousel__wrapper', {
+      direction: 'horizontal',
       slidesPerView: 'auto',
       freeMode: true,
       spaceBetween: 24, 
@@ -904,6 +949,25 @@ function objectsSwiper() {
 
   // kickstart
   breakpointChecker();
+
+  //enable horizontal scroll with lenis
+
+  function initialiseGSAPScrollTriggerPinningHorizontal() {
+    let sectionPin = document.querySelector('.objects-carousel__wrapper');
+
+    let containerAnimation = gsap.to(sectionPin, {
+      scrollTrigger: {
+        trigger: '.main-wrapper',
+        start: 'top top',
+        end: () => "+=" + sectionPin.offsetWidth,
+        pin: true,
+        scrub: true,
+        markers: true,
+      },
+      x: () => -(sectionPin.scrollWidth - document.documentElement.clientWidth) + "px",
+      ease: 'none'
+    });
+  }
 }
 
 function animateEnquire() {
