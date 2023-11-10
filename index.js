@@ -856,13 +856,20 @@ function objectsIndex() {
   let currentAsset;
 
   objects.forEach((el, index) => { //em cada item da lista 
+    let firstMouseMove = true;
+
     el.addEventListener('mousemove', function (e) { //no mousemove, mexe o asset container
+      if (firstMouseMove) {
+        assetContainer.style.top = '0';
+        assetContainer.style.left = '0';
+        firstMouseMove = false;
+      }
+
       assetContainer.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
     });
 
     el.addEventListener('mouseover', () => { //no mouseenter
       currentAsset = allAssets[index];
-  
       let iframe = currentAsset.querySelector('iframe'),
         iframeBackground = currentAsset.querySelector('.vimeo-wrapper');
 
@@ -923,14 +930,13 @@ function objectsSwiper() {
 	    if ( objectsSwiper !== undefined ) objectsSwiper.destroy( true, true );
 	    return;
     } else if ( breakpoint.matches === false ) { // else if a small viewport and single column layout needed
-      const functionsToExecute = [enableSwiper, initialiseGSAPScrollTriggerPinningHorizontal];
+      const functionsToExecute = [enableSwiper, horizontalScroll];
 
       functionsToExecute.forEach((func) => {
         if (typeof func === 'function') {
           func(); // Call the function
         }
       });
-      //return [enableSwiper, initialiseGSAPScrollTriggerPinningHorizontal]; // fire small viewport version of swiper
     }
   };
   
@@ -951,20 +957,17 @@ function objectsSwiper() {
   breakpointChecker();
 
   //enable horizontal scroll with lenis
-
-  function initialiseGSAPScrollTriggerPinningHorizontal() {
+  function horizontalScroll() {
     let sectionPin = document.querySelector('.objects-carousel__wrapper');
 
     let containerAnimation = gsap.to(sectionPin, {
       scrollTrigger: {
-        trigger: '.main-wrapper',
+        trigger: '.main-wrapper[data-barba-namespace="objects-single"]',
         start: 'top top',
         end: () => "+=" + sectionPin.offsetWidth,
         pin: true,
         scrub: true,
-        markers: true,
       },
-      x: () => -(sectionPin.scrollWidth - document.documentElement.clientWidth) + "px",
       ease: 'none'
     });
   }
@@ -1067,40 +1070,79 @@ function aboutVideo() {
 }
 
 function aboutIndexes() {
-  const index = document.querySelectorAll('.about-three-col__index');
+  const aboutIndexesSections = document.querySelectorAll('.about-three-col'); // Replace with the class that identifies your sections
 
-  index.forEach(el => {
-    let asset = el.querySelector('.about-three-col__asset-wrapper'),
-      iframe = asset.querySelector('iframe');
+  aboutIndexesSections.forEach(section => {
+    const indexes = section.querySelectorAll('.about-three-col__link');
+    const allAssets = section.querySelectorAll('.about-three-col__assets'); //get all images/videos
+    const assetContainer = section.querySelector('.about-three-col__asset-wrapper'); //get the wrapper for the asset
+    let isVideoPlaying = false;
+    let currentAsset;
 
-    el.addEventListener('mouseenter', () => {
-      asset.style.opacity = 1;
+    indexes.forEach((el, index) => { //em cada item da lista 
+      let firstMouseMove = true;
 
-      el.addEventListener('mousemove', function(e) {
-        let mouseX = e.pageX - el.offsetLeft;
-        let containerWidth = el.offsetWidth;
-        let imageWidth = asset.offsetWidth;
-        let maxOffset = Math.min((containerWidth - imageWidth) / 2, 200);
-        let offsetX = ((mouseX - containerWidth / 2) / containerWidth) * maxOffset;
+      el.addEventListener('mousemove', function (e) { //no mousemove, mexe o asset container
+        if (firstMouseMove) {
+          assetContainer.style.top = '0';
+          assetContainer.style.left = '0';
+          firstMouseMove = false;
+        }
 
-        asset.style.transform = 'translateX(' + offsetX + 'px)';
+        assetContainer.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
       });
 
-      if (iframe) {
-        let player = new Vimeo.Player(iframe);
-		    player.play();
-      }
-    });
+      el.addEventListener('mouseover', () => { //no mouseenter
+        currentAsset = allAssets[index];
+        let iframe = currentAsset.querySelector('iframe'),
+          iframeBackground = currentAsset.querySelector('.vimeo-wrapper');
 
-    el.addEventListener('mouseout', () => {
-      asset.style.opacity = 0;
+        if (currentAsset) { //se este elemento da lista tiver asset
+          assetContainer.style.opacity = 1;
+          
+          currentAsset.style.zIndex = 1;
 
-      if (iframe) {
-        let player = new Vimeo.Player(iframe);
-		    player.pause();
-      }
+          gsap.set(currentAsset, { autoAlpha: 1 }); 
+
+          gsap.to(currentAsset, {
+            duration: 0.2,
+            scale: 1.05,  
+          });
+
+          if (iframe && iframe.dataset.videoId) {
+            iframe.src = iframe.dataset.src; 
+    
+            let player = new Vimeo.Player(iframe);
+    
+            player.on('play', function() {
+              iframeBackground.style.backgroundImage = 'none';
+              iframe.style.opacity = 1;
+              isVideoPlaying = true; 
+            });
+    
+            player.play().catch(function (error) {
+              console.error('Failed to play video:', error);
+              isVideoPlaying = false; //set this to false if play failed
+            });
+          }
+        }
+      });
+
+      el.addEventListener('mouseout', () => {
+        let iframe = currentAsset.querySelector('iframe');
+
+        currentAsset.style.zIndex = 0;
+        gsap.to(currentAsset, { autoAlpha: 0, scale: 1, duration: 0.4 });
+
+        if (iframe && iframe.dataset.videoId && isVideoPlaying) {
+          let player = new Vimeo.Player(iframe);
+          
+          player.pause();
+          isVideoPlaying = false;
+        }
+      });
     });
-  });
+  })
 }
 
 function locationHover() {
