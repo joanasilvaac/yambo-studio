@@ -779,58 +779,58 @@ function projectsNavigation() {
 }
 
 function projectSrollAnimations() {
-  gsap.registerPlugin(ScrollTrigger);
-  gsap.registerPlugin(SplitText);
-  lenis.on('scroll', ScrollTrigger.update);
+  setTimeout(() => {
+    let captions = document.querySelectorAll('.proj-text-caption');
+    const sections = ['.proj-text-intro', '.proj-16x9-video', '.proj-16x9-col12', '.proj-video-loop', '.proj-text-col8', '.proj-16x9-col12-carousel', '.proj-16x9-col10', '.proj-credits'];
 
-  let captions = document.querySelectorAll('.proj-text-caption');
-  const sections = ['.proj-text-intro', '.proj-16x9-video', '.proj-16x9-col12', '.proj-video-loop', '.proj-text-col8', '.proj-16x9-col12-carousel', '.proj-16x9-col10', '.proj-credits'];
+    sections.forEach((classSelector) => {
+      const elements = document.querySelectorAll(classSelector);
 
-  sections.forEach((classSelector) => {
-    const elements = document.querySelectorAll(classSelector);
-
-    elements.forEach((el) => {
-      if( !el.classList.contains('animated') ) {
-        gsap.fromTo(el,
-          { y: 40, opacity: 0, },
-          { 
-            y: 0,
-            duration: 1,
-            opacity: 1,
-            ease: 'power4',
-            scrollTrigger: {
-              trigger: el,
-              start: 'top-=40 center+=200',
-              end: 'bottom bottom',
-              //markers: true,
-            },
-            onComplete:function() { el.classList.add('animated') },
-          }
-        );
-      }
-    });
-  });
-
-  captions.forEach((el) => {
-    const splitLines = new SplitText(el.querySelector('p'), {
-      type: "lines",
-      linesClass: "line line++"
+      elements.forEach((el) => {
+        if( !el.classList.contains('animated') ) {
+          gsap.fromTo(el,
+            { y: 40, opacity: 0, },
+            { 
+              y: 0,
+              duration: 1,
+              opacity: 1,
+              ease: 'power4',
+              scrollTrigger: {
+                trigger: el,
+                start: 'top-=40 center+=200',
+                end: 'bottom bottom',
+                //markers: true,
+              },
+              onComplete:function() {
+                el.classList.add('animated')
+              },
+            }
+          );
+        }
+      });
     });
 
-    gsap.from(splitLines.lines, {
-      yPercent: 50,
-      duration: 1.2,
-      opacity: 0,
-      stagger: 0.2,
-      ease: "power4",
-      scrollTrigger: {
-        trigger: el,
-        start: "top center+=200",
-        end: "bottom bottom",
-        //markers: true
-      }
+    captions.forEach((el) => {
+      const splitLines = new SplitText(el.querySelector('p'), {
+        type: "lines",
+        linesClass: "line line++"
+      });
+
+      gsap.from(splitLines.lines, {
+        yPercent: 50,
+        duration: 1.2,
+        opacity: 0,
+        stagger: 0.2,
+        ease: "power4",
+        scrollTrigger: {
+          trigger: el,
+          start: "top center+=200",
+          end: "bottom bottom",
+          //markers: true
+        }
+      });
     });
-  });
+  }, 1000);
 }
 
 
