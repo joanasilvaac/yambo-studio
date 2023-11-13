@@ -791,24 +791,26 @@ function projectSrollAnimations() {
 
     elements.forEach((el) => {
       if( !el.classList.contains('animated') ) {
-        gsap.from(el, {
-          y: 10,
-          duration: 1,
-          opacity: 0,
-          ease: 'power4',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top-=10 center+=200',
-            end: 'bottom bottom',
-            //markers: true,
+        gsap.fromTo(el,
+          { y: 40, opacity: 0, },
+          { 
+            y: 0,
+            duration: 1,
+            opacity: 1,
+            ease: 'power4',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top-=40 center+=200',
+              end: 'bottom bottom',
+              //markers: true,
+            },
+            onComplete:function() { el.classList.add('animated') },
           }
-        });
-
-        el.classList.add('animated')
+        );
       }
     });
   });
-  
+
   captions.forEach((el) => {
     const splitLines = new SplitText(el.querySelector('p'), {
       type: "lines",
@@ -816,10 +818,10 @@ function projectSrollAnimations() {
     });
 
     gsap.from(splitLines.lines, {
-      yPercent: 100,
-      duration: 0.6,
+      yPercent: 50,
+      duration: 1.2,
       opacity: 0,
-      stagger: 0.1,
+      stagger: 0.2,
       ease: "power4",
       scrollTrigger: {
         trigger: el,
