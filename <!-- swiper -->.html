@@ -1,0 +1,521 @@
+<!-- swiper -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
+
+<!-- vimeo player -->
+<script src="https://player.vimeo.com/api/player.js"></script>
+
+<!-- barbajs -->
+<script src="https://unpkg.com/@barba/core"></script>
+
+<!-- cookie plugin -->
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+
+<!-- gsap -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+
+<!-- SplitText -->
+<script src="https://res.cloudinary.com/dsrjjkcwr/raw/upload/v1685377426/gsap-shockingly-green/minified/SplitText.min_xnaxjq.js"></script>
+
+<!-- ScrollTrigger -->
+<script src="https://res.cloudinary.com/dsrjjkcwr/raw/upload/v1685377431/gsap-shockingly-green/minified/ScrollTrigger.min_urpjmb.js"></script>
+
+<!-- lenis scroll -->
+<script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.26/bundled/lenis.min.js"></script> 
+
+<!-- custom js -->
+<!-- <script src="https://res.cloudinary.com/dsrjjkcwr/raw/upload/v1696433317/js-until-search_brscbm.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/gh/unsetstudio/yambo-studio@v10/index.js"></script> -->
+<script src="http://127.0.0.1:5500/index.js"></script> 
+
+<script>   
+/* disable scroll */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.menu-toggle').forEach(trigger => {
+    trigger.addEventListener('click', function(){ 
+      this.x = ((this.x || 0) + 1)%2; 
+      if(this.x){ 
+        document.querySelectorAll('body').forEach(target => target.classList.add('disable-scroll'));
+      }
+      else{ 
+        document.querySelectorAll('body').forEach(target => target.classList.remove('disable-scroll'));
+      } 
+    });
+  });
+});
+
+/* cookie banner */
+let cookieBanner = document.querySelector('.cookie-banner'), 
+    cookieButton = document.querySelector('.cookie-banner__button');
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (Cookies.get('cookieBannerDismissed')) {
+        cookieBanner.parentNode.removeChild(cookieBanner);
+    } else {
+		cookieBanner.style.pointerEvents = 'all';
+        cookieBanner.style.opacity = '1';
+    }
+});
+  
+cookieButton.addEventListener('click', function() {
+	cookieBanner.style.opacity = '0';
+	
+	setTimeout(() => {
+      cookieBanner.parentNode.removeChild(cookieBanner);
+	  Cookies.set('cookieBannerDismissed', true);
+    }, '300');
+});
+
+/* reload automatically */
+let resizeTimeout;
+
+function debounce(func, delay) {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(func, delay);
+}
+
+function onWindowResize() {
+  homepageHeroDesktop();
+  homepageHeroMobile();
+  stickyReturn();
+  objectsHeroDesktop();
+  objectsHeroMobile();
+  objectsSwiper();
+}
+
+window.addEventListener('resize', function () {
+  debounce(onWindowResize, 2000); // 2000 milliseconds (2 seconds) delay
+});
+
+/* search lottie */
+var lottie, animations;
+
+async function animationLoaded (animation) {
+  if (animation.isLoaded) {
+    return true
+  }
+
+  return new Promise((resolve, reject) => {
+    animation.addEventListener('DOMLoaded', () => {
+      resolve(true)
+    })
+  })
+}
+
+async function waitForAnimationsLoaded (animations) {
+  await Promise.all(animations.map(animationLoaded))
+}
+
+async function initAnimations () {
+  lottie = Webflow.require('lottie').lottie
+  animations = lottie.getRegisteredAnimations()
+  await waitForAnimationsLoaded(animations)
+}
+
+var Webflow = Webflow || [] //initial trigger, so it works before any barbajs transition
+
+Webflow.push(() => {
+  initAnimations()
+    .then(() => {
+      animations[0].isPaused = true;
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+})
+</script>
+
+<script>   
+barba.hooks.after(function(data) {
+  resetWebflow(data); 
+  
+  // reset scroll trigger
+  let scrollTriggers = ScrollTrigger.getAll();
+  triggers.forEach(function (trigger) {
+    trigger.kill();
+  });
+  
+  // search lottie realted
+  Webflow.push(() => {
+    initAnimations()
+      .then(() => {
+      animations[0].isPaused = true;
+    })
+      .catch((error) => {
+      console.error(error)
+    })
+  })
+});
+  
+barba.init({
+  views: [{
+    namespace: 'home',
+    beforeEnter() {
+      loading()
+      customCursors()
+	    currentYear()
+      //iframePoster()
+      homepageHeroDesktop()
+      homepageHeroMobile()
+      projectsIndex()
+    }
+  }, {
+    namespace: 'about',
+    beforeEnter() {
+      customCursors()
+      currentYear()
+      currentYear()
+      iframePoster()
+      aboutIndexes()
+      locationHover()
+    }, 
+    afterEnter() {
+      aboutVideo()
+    }
+  }, {
+    namespace: 'objects',
+    beforeEnter() {
+      customCursors()
+      currentYear()
+      iframePoster()
+      objectsHeroDesktop()
+      objectsHeroMobile()
+      objectsIndex()
+      objectsEnquire()
+    }, 
+  },{
+    namespace: 'objects-single',
+    beforeEnter() {
+      customCursors()
+      currentYear()
+      iframePoster()
+      objectsSwiper()
+      objectsDownload()
+    }, 
+  }, {
+    namespace: 'projects',
+    beforeEnter() {
+      customCursors()
+      currentYear()
+      iframePoster()
+      projectsSwiper()
+      scrollDownAnimation()
+      videoComponent()
+      stickyReturn()
+      projectsNavigation()
+    }
+  }, {
+    namespace: 'search',
+    beforeEnter() {
+      customCursors()
+      currentYear()
+      searchEnter()
+      search()
+      searchUpdateIframe()
+    }
+  }, {
+    namespace: 'error',
+    beforeEnter() {
+      customCursors()
+      currentYear()
+      errorPage()
+    }
+  }],
+  transitions: [
+  {
+    preventRunning: true, //don't run animations on top of each other
+    cacheIgnore: true,
+    name: 'default-transition',
+    leave(data) {
+      return gsap.to(data.current.container, {
+        opacity: 0
+      });
+    },
+    enter(data) {
+      gsap.defaults({
+        ease: 'power2.inOut',
+        duration: 0.8
+      });
+  
+      data.next.container.classList.add('fixed');
+      
+      // Reveal page 
+      return gsap.fromTo(
+        data.next.container,
+        { opacity: 0 }, 
+        {	
+          opacity: 1, 
+          onStart: () => {
+            window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+            });
+          },
+          onComplete: () => {
+            data.next.container.classList.remove('fixed');
+          }
+        }
+      );
+    }
+  },
+  {
+    preventRunning: true, //don't run animations on top of each other
+    name: 'project-enter',
+    from: { 
+      namespace: ['home']
+    },
+    to: { 
+      namespace: ['projects']
+    },
+    leave(data) {
+      Cookies.set('scrollPositionProject', window.pageYOffset)
+    
+      return gsap.to(data.current.container, {
+        opacity: 0
+      });
+    },
+    enter(data) {
+      gsap.defaults({
+        ease: 'power2.inOut',
+        duration: 0.8
+      });
+  
+      data.next.container.classList.add('fixed');
+      
+      // Reveal page 
+      return gsap.fromTo(
+        data.next.container,
+        { opacity: 0 }, 
+        {	
+          opacity: 1, 
+          onStart: () => {
+            window.scrollTo({
+              top: 0,
+              left: 0,
+            });
+          },
+          onComplete: () => {
+            data.next.container.classList.remove('fixed');
+          }
+        }
+      );
+    }
+  },
+  {
+    preventRunning: true, //don't run animations on top of each other
+    name: 'project-leave',
+    from: { 
+      namespace: ['projects']
+    },
+    to: { 
+      namespace: ['home']
+    },
+    leave(data) {
+      return gsap.to(data.current.container, {
+        opacity: 0
+      });
+    },
+    enter(data) {
+      gsap.defaults({
+        ease: 'power2.inOut',
+        duration: 0.8
+      });
+    
+      // Reveal page 
+      return gsap.fromTo(
+        data.next.container,
+        { opacity: 0 }, 
+        {	
+          opacity: 1, 
+          onComplete: () => {
+            const nextContainerHeight = data.next.container.getBoundingClientRect().height;
+            const scrollPosition = Cookies.get('scrollPositionProject');
+  
+            //wait until height of next container is fully available
+            if (nextContainerHeight >= window.innerHeight) {
+              //set scroll position to saved position
+              window.scrollTo({
+                top: scrollPosition,
+                behavior: 'smooth'
+              });
+            }
+          },
+        }
+      );
+    }
+  }, 
+	{
+    preventRunning: true, //don't run animations on top of each other
+      name: 'objects-enter',
+      from: { 
+        namespace: ['objects']
+      },
+      to: { 
+        namespace: ['objects-single']
+      },
+      leave(data) {
+        Cookies.set('scrollPositionObjects', window.pageYOffset)
+      
+        return gsap.to(data.current.container, {
+          opacity: 0
+        });
+      },
+      enter(data) {
+        gsap.defaults({
+          ease: 'power2.inOut',
+          duration: 0.8
+        });
+    
+        data.next.container.classList.add('fixed');
+        
+        // Reveal page 
+        return gsap.fromTo(
+          data.next.container,
+          { opacity: 0 }, 
+          {	
+            opacity: 1, 
+            onStart: () => {
+              window.scrollTo({
+                top: 0,
+                left: 0,
+              });
+            },
+            onComplete: () => {
+              data.next.container.classList.remove('fixed');
+            }
+          }
+        );
+      }
+    },
+    {
+      preventRunning: true, //don't run animations on top of each other
+      name: 'objects-leave',
+      from: { 
+        namespace: ['objects-single']
+      },
+      to: { 
+        namespace: ['objects']
+      },
+      leave(data) {
+        return gsap.to(data.current.container, {
+          opacity: 0
+        });
+      },
+      enter(data) {
+        gsap.defaults({
+          ease: 'power2.inOut',
+          duration: 0.8
+        });
+
+        // Reveal page 
+        return gsap.fromTo(
+          data.next.container,
+          { opacity: 0 }, 
+          {	
+          	opacity: 1, 
+            onComplete: () => {
+              const nextContainerHeight = data.next.container.getBoundingClientRect().height;
+              const scrollPosition = Cookies.get('scrollPositionObjects');
+
+              //wait until height of next container is fully available
+              if (nextContainerHeight >= window.innerHeight) {
+                //set scroll position to saved position
+                window.scrollTo({
+                  top: scrollPosition,
+                  behavior: 'smooth'
+                });
+              }
+            }
+          }
+        );
+      }
+    }, 
+    {
+      preventRunning: true, //don't run animations on top of each other
+      name: 'search-enter',
+      to: { 
+        namespace: ['search']
+      },
+      enter(data) {  
+        animations[0].play();
+        
+        gsap.defaults({
+          ease: 'power2.inOut',
+          duration: 0.8
+        });
+    
+        data.next.container.classList.add('fixed');
+        document.querySelector('.navbar__search').classList.add('clickable-off');
+        
+        // Reveal page 
+        return gsap.fromTo(
+          data.next.container,
+          { opacity: 0 }, 
+          {	
+            opacity: 1, 
+            onStart: () => {
+              window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'smooth'
+              });
+            },
+            onComplete: () => {
+              data.next.container.classList.remove('fixed');
+            }
+          }
+        );
+      }
+    },
+    {
+      preventRunning: true, //don't run animations on top of each other
+      name: 'search-leave',
+      from: { 
+        namespace: ['search']
+      },
+      beforeLeave() {
+        animations[0].setDirection(-1);
+        animations[0].goToAndPlay(18, true);
+      },
+      leave(data) {    
+        return gsap.to(data.current.container, {
+          opacity: 0, 
+          y: -50,
+          onComplete: () => {
+            document.querySelector('.search-input__wrapper').classList.remove('active');
+            document.querySelector('.navbar__search').classList.remove('clickable-off');
+          }
+        });
+      },
+      enter(data) {
+        gsap.defaults({
+          ease: 'power2.inOut',
+          duration: 0.8
+        });
+    
+        data.next.container.classList.add('fixed');
+        
+        // Reveal page 
+        return gsap.fromTo(
+          data.next.container,
+          { opacity: 0 }, 
+          {	
+            opacity: 1, 
+            onStart: () => {
+              window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'smooth'
+              });
+            },
+            onComplete: () => {
+              data.next.container.classList.remove('fixed');
+            }
+          }
+        );
+      }
+    }
+  ]
+});
+</script>

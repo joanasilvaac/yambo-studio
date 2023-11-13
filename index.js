@@ -48,6 +48,8 @@ requestAnimationFrame(raf);
 //   });
 // });
 
+
+
 /* logo interaction */
 gsap.registerPlugin(SplitText);
 
@@ -372,7 +374,7 @@ function iframePoster() {
 
     player.on("play", function() {
       iframeEl.style.opacity = 1;
-      componentEl.querySelector('.vimeo-wrapper').style.backgroundImage = 'transparent';
+      componentEl.querySelector('.vimeo-wrapper').style.background = 'transparent';
     });
 	})
 }
@@ -777,7 +779,47 @@ function projectsNavigation() {
 }
 
 function projectSrollAnimations() {
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(SplitText);
+
   let captions = document.querySelectorAll('.proj-text-caption');
+  // let sections = document.querySelectorAll('.section');
+
+  // sections.forEach((el) => {
+  //   gsap.from(el, {
+  //     yPercent: 100,
+  //     duration: 0.6,
+  //     opacity: 0,
+  //     ease: "power4",
+  //     scrollTrigger: {
+  //       trigger: el,
+  //       start: "top center+=200",
+  //       end: "bottom bottom",
+  //       markers: true
+  //     }
+  //   });
+  // });
+
+  captions.forEach((el) => {
+    const splitLines = new SplitText(el.querySelector('p'), {
+      type: "lines",
+      linesClass: "line line++"
+    });
+
+    gsap.from(splitLines.lines, {
+      yPercent: 100,
+      duration: 0.6,
+      opacity: 0,
+      stagger: 0.1,
+      ease: "power4",
+      scrollTrigger: {
+        trigger: el,
+        start: "top center+=200",
+        end: "bottom bottom",
+        //markers: true
+      }
+    });
+  });
 }
 
 
@@ -786,10 +828,10 @@ function objectsHeroDesktop() {
   if (window.matchMedia('(min-width: 992px)').matches) {
     const heroWords = document.querySelectorAll('[data-obj-word]');
     const images = document.querySelectorAll('[data-obj-image]');
-    let activeImage = images[0]; // select the activeImage, start with first one
+    let activeImage = images[0]; // select the activeImage = active asset, start with first one (its called image cause it wasnt suppose to have video initially)
 
     if (activeImage) {
-      activeImage.classList.add('active');
+      activeImage.classList.add('active'); //show current asset
     }
 
     // trigger the mousemove interaction for the active image
@@ -805,7 +847,7 @@ function objectsHeroDesktop() {
     heroWords.forEach(function(word) {
       word.addEventListener('mouseenter', function() {
         let code = this.getAttribute('data-obj-word');
-        let imageEl = document.querySelector('[data-obj-image="' + code + '"]');
+        let imageEl = document.querySelector('[data-obj-image="' + code + '"]'); 
 
         if (imageEl && imageEl !== activeImage) {
           activeImage.classList.remove('active'); //remove previous active img
