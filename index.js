@@ -781,25 +781,34 @@ function projectsNavigation() {
 function projectSrollAnimations() {
   gsap.registerPlugin(ScrollTrigger);
   gsap.registerPlugin(SplitText);
+  lenis.on('scroll', ScrollTrigger.update);
 
   let captions = document.querySelectorAll('.proj-text-caption');
-  // let sections = document.querySelectorAll('.section');
+  const sections = ['.proj-text-intro', '.proj-16x9-video', '.proj-16x9-col12', '.proj-video-loop', '.proj-text-col8', '.proj-16x9-col12-carousel', '.proj-16x9-col10', '.proj-credits'];
 
-  // sections.forEach((el) => {
-  //   gsap.from(el, {
-  //     yPercent: 100,
-  //     duration: 0.6,
-  //     opacity: 0,
-  //     ease: "power4",
-  //     scrollTrigger: {
-  //       trigger: el,
-  //       start: "top center+=200",
-  //       end: "bottom bottom",
-  //       markers: true
-  //     }
-  //   });
-  // });
+  sections.forEach((classSelector) => {
+    const elements = document.querySelectorAll(classSelector);
 
+    elements.forEach((el) => {
+      if( !el.classList.contains('animated') ) {
+        gsap.from(el, {
+          y: 10,
+          duration: 1,
+          opacity: 0,
+          ease: 'power4',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top-=10 center+=200',
+            end: 'bottom bottom',
+            //markers: true,
+          }
+        });
+
+        el.classList.add('animated')
+      }
+    });
+  });
+  
   captions.forEach((el) => {
     const splitLines = new SplitText(el.querySelector('p'), {
       type: "lines",
