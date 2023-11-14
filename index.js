@@ -780,9 +780,9 @@ function projectsNavigation() {
 
 function projectSrollAnimations() {
   setTimeout(() => {
-    let captions = document.querySelectorAll('.proj-text-caption');
-    const sections = ['.proj-text-intro', '.proj-16x9-video', '.proj-16x9-col12', '.proj-video-loop', '.proj-text-col8', '.proj-16x9-col12-carousel', '.proj-16x9-col10', '.proj-credits'];
-
+    const sectionsLines = ['.proj-text-col8', '.proj-text-col6', '.proj-text-block'];
+    const sections = ['.proj-text-intro', '.proj-16x9-video', '.proj-16x9-col12', '.proj-video-loop', '.proj-16x9-col12-carousel', '.proj-16x9-col10', '.proj-credits'];
+    
     sections.forEach((classSelector) => {
       const elements = document.querySelectorAll(classSelector);
 
@@ -792,14 +792,14 @@ function projectSrollAnimations() {
             { y: 40, opacity: 0, },
             { 
               y: 0,
-              duration: 1,
+              duration: 0.8,
               opacity: 1,
               ease: 'power4',
               scrollTrigger: {
                 trigger: el,
-                start: 'top-=40 center+=200',
+                start: 'top-=40 bottom-=200',
                 end: 'bottom bottom',
-                //markers: true,
+                markers: true,
               },
               onComplete:function() {
                 el.classList.add('animated')
@@ -810,23 +810,42 @@ function projectSrollAnimations() {
       });
     });
 
-    captions.forEach((el) => {
-      const splitLines = new SplitText(el.querySelector('p'), {
-        type: "lines",
-        linesClass: "line line++"
-      });
+    sectionsLines.forEach((classSelector) => {
+      const elements = document.querySelectorAll(classSelector);
 
-      gsap.from(splitLines.lines, {
-        yPercent: 50,
-        duration: 1.2,
-        opacity: 0,
-        stagger: 0.2,
-        ease: "power4",
-        scrollTrigger: {
-          trigger: el,
-          start: "top center+=200",
-          end: "bottom bottom",
-          //markers: true
+      elements.forEach((el) => {
+        const splitLines = new SplitText(el.querySelector('.proj-text__paragraph'), {
+          type: "lines",
+          linesClass: "line line++"
+        });
+
+        const blockLink = el.querySelector('.proj-text-block__link');
+
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: el,
+            start: "top center+=200",
+            end: "bottom bottom",
+            //markers: true,
+          },
+        });
+
+        timeline.from(splitLines.lines, { // lines animation
+          yPercent: 50,
+          duration: 1,
+          opacity: 0,
+          stagger: 0.1,
+          ease: "power4",
+        });
+
+        if (blockLink) { // check if blockLink exists and add its animation to the timeline
+          gsap.set(blockLink, { opacity: 0 });
+
+          timeline.to(blockLink, {
+            opacity: 0.5,
+            duration: 0.6,
+            ease: "power4",
+          });
         }
       });
     });
