@@ -294,7 +294,7 @@ function customCursors() {
   const cursors = document.querySelector('.cursor-wrapper');
   const customCursors = document.querySelectorAll('[data-cursor]');
 
-  document.querySelectorAll('a, button, [data-cursor-hover="true"]').forEach(element => {
+  document.querySelectorAll('a, button, [data-cursor-hover="true"], .proj-16x9-video, .proj-1x1-video').forEach(element => {
     element.addEventListener('mouseenter', () => {
       cursors.style.opacity = '0';
     });
@@ -369,6 +369,7 @@ function customCursors() {
   }
 }
 
+
 function iframePoster() {
 	document.querySelectorAll("[data-vimeo-poster='true']").forEach(function(componentEl) {
     const iframeEl = componentEl.querySelector("iframe");
@@ -389,6 +390,14 @@ function currentYear() {
     el.textContent = currentYear;
   })
 }
+
+/* Hide/Show scrollbar */
+function hideScrollbar() {
+  document.body.classList.add('hide-scrollbar');
+}
+function showScrollbar() {
+  document.body.classList.remove('hide-scrollbar');
+}
   
 /** HOMEPAGE */
 function homepageHeroDesktop() { //add hover state to clients hero
@@ -396,7 +405,7 @@ function homepageHeroDesktop() { //add hover state to clients hero
     const clients = document.querySelectorAll('.hero__client-wrapper');
     
     clients.forEach((el) => {
-      let clientName = el.querySelector('.hero__client-text[data-hover]');
+      let clientName = el.querySelector('.hero__client-text');
 
       let assetContainer = el.querySelector('.hero__client-background'), 
         video =  assetContainer.querySelector('video'),
@@ -786,7 +795,6 @@ function projectSrollAnimations() {
     const sectionsLines = ['.proj-text-col6', '.proj-text-col8', '.proj-text-block'];
 
     const sections = [
-      '.project-hero',
       '.proj-text-intro',
       '.proj-text-caption',
       '.proj-credits',
@@ -1299,230 +1307,6 @@ function locationHover() {
     }
   }
 }
-
-// /** SEARCH */
-// function searchEnter() { //so it works on refresh
-//   setTimeout(function() {
-//     document.querySelector('.search-input__wrapper').classList.add('active');  
-
-//     setTimeout(function() {
-//         document.getElementById('search').focus();
-//     }, 600);
-//   }, 800);
-// }
-
-// function search() { 
-//   gsap.registerPlugin(SplitText);
-
-//   // prevent form submit
-//   $('#search-form').submit(function() {
-//     return false;
-//   });
-
-//   let projectResults = document.querySelector('[data-search="projects"]'), //wrapper para onde vão os match de projectos
-//     objectsResults = document.querySelector('[data-search="objects"]'), //wrapper para onde vão os match de objetos
-//     searchInput = document.getElementById('search'); //o input
-
-//   gsap.set('.search-empty', { autoAlpha: 0 } ); // hide empty state default
-//   //gsap.set('.search [data-animation="stagger"]', { opacity: 0, y: 10 }); //coloca todos os resultados (projectos e objetos) em y: 10 para dps os animar
-//   //gsap.set('.search-result-col', { display: 'none', autoAlpha: 0 }); 
-//   gsap.set(projectResults, { display: 'none', autoAlpha: 0 });
-//   gsap.set(objectsResults, { display: 'none', autoAlpha: 0 });
-
-//   // attach event listeners for input changes
-//   let typingTimeout;
-
-//   searchInput.addEventListener('keydown', function() { //faz trigger to search no keydown após 1seg 
-//     clearTimeout(typingTimeout);  // clear any existing timeout
-
-//     typingTimeout = setTimeout(function() {
-//       searchItems();
-//     }, 1000); // wait 1sec for user stops typing
-//   });
-
-//   function searchItems() {
-//     document.querySelector('.search').classList.add('searched'); 
-//     gsap.to('.search-empty', { autoAlpha: 0, duration: 0.2 }); //ocultar a info de empty results
-    
-//     let searchTerm = searchInput.value.toLowerCase(); //vai buscar o valor procurado e coloca em minúsuclas
-
-//     if (searchTerm === "") { //se o input tiver vazio é pq é para fazer um reset
-//       resetSearch(); 
-//       return;
-//     } 
-
-//     let filterItems = document.querySelectorAll('.search-result-col');
-
-//     filterItems.forEach(function(item) {
-//       let project = item.getAttribute('data-search-name').toLowerCase(); //nome do projeto 
-//       let client = item.getAttribute('data-search-client'); //nome do cliente
-    
-//       if (searchTerm !== '') { //existe algo no input? ... 
-//         client = client ? client.toLowerCase() : ''; //check if client exists and, if so, convert it to lowercase for comparison
-    
-//         if (client.includes(searchTerm) || project.includes(searchTerm)) { //o search term faz parte de um cliente ou nome de projeto? 
-//           gsap.set(item, { display: 'block' }); //coloca esse item com display block
-//           gsap.to(item, { autoAlpha: 1, duration: 0.3 }); 
-//           item.setAttribute('data-visibility', 'visible');
-//         } else {
-//           if (item.getAttribute('data-visibility') == 'visible') { //se o item já tiver visibilidade e não corresponder, oculta 
-//             gsap.set(item, { display: 'none' }); 
-//             gsap.to(item, { autoAlpha: 0, duration: 0.3 }); 
-//             item.setAttribute('data-visibility', 'hide');
-//           }
-//         }
-//       } 
-//     });
-  
-//     // check if there are results 
-//     let searched = document.querySelector('.search').classList.contains('searched'),
-//       projectsCount = projectResults.querySelectorAll('.search-result-col[data-visibility="visible"]').length,
-//       objcetsCount = objectsResults.querySelectorAll('.search-result-col[data-visibility="visible"]').length,
-//       projectsText = projectResults.querySelector('.search-results__count'),
-//       objectsText = objectsResults.querySelector('.search-results__count');
-    
-//     if(searched && projectsCount>0) { //se tiver searched e existirem projetos com match
-//       gsap.set(projectResults, { display: 'block'} )
-//       gsap.to(projectResults, { autoAlpha: 1 , duration: 0.3 }) //isto é a seção wrapper de todos os projectos
-//       projectResults.setAttribute('data-visibility', 'visible');
-
-//       if (projectsCount==1) {
-//         projectsText.innerHTML = '1 result'
-//       } else {
-//         projectsText.innerHTML = projectsCount + ' results'
-//       }
-//     }
-
-//     if(searched && objcetsCount>0) { //se tiver searched e existirem objects com match
-//       gsap.set(objectsResults, { display: 'block'} )
-//       gsap.to(objectsResults, { autoAlpha: 1 , duration: 0.3 }) //isto é a seção wrapper de todos os objects
-//       objectsResults.setAttribute('data-visibility', 'visible');
-
-//       if (objcetsCount==1) {
-//         objectsText.innerHTML = '1 result'
-//       } else {
-//         objectsText.innerHTML = objcetsCount + ' results'
-//       }
-//     }
-
-//     if ( searched && projectsCount>0 && objcetsCount == 0) { //se estiver searched e só projetos fizerem match
-//       gsap.set(objectsResults, { display: 'none'} )
-//       gsap.to(objectsResults, { autoAlpha: 0 , duration: 0.3 })
-//       objectsResults.setAttribute('data-visibility', 'hide');
-//     }
-
-//     if ( searched && objcetsCount>0 && projectsCount == 0) { //se estiver searched e só objects fizerem match
-//       gsap.set(projectResults, { display: 'none'} )
-//       gsap.to(projectResults, { autoAlpha: 0 , duration: 0.3 })
-//       projectResults.setAttribute('data-visibility', 'hide');
-//     }
-
-//     if(searched && projectsCount==0 && objcetsCount==0) { //se estiver search e nada fizer match
-//       gsap.to(projectResults, { autoAlpha: 0 , duration: 0.3,
-//         onComplete: function() { 
-//           gsap.set(projectResults, { display: 'none' }); 
-//           objectsResults.setAttribute('data-visibility', 'hide');
-//         }
-//       });
-
-//       gsap.to(objectsResults, { autoAlpha: 0 , duration: 0.3,
-//         onComplete: function() { 
-//           gsap.set(objectsResults, { display: 'none' }); 
-//           objectsResults.setAttribute('data-visibility', 'hide');
-//         }
-//       });
-
-//       animateEmpty()
-//     }
-
-//     // if ( 
-//     //   projectResults.dataset.visibility == 'visible' || 
-//     //   objectsResults.dataset.visibility == 'visible'||
-//     //   (projectResults.dataset.visibility == 'visible' && objectsResults.dataset.visibility == 'visible')
-//     // ) {
-//     //   animateResults();
-//     // }
-//   }
-
-//   // reset button 
-//   document.querySelector('.search-reset').addEventListener('click', function() {
-//     resetSearch();
-//     window.history.back();
-//   }); 
-
-//   // empty animation 
-//   function animateEmpty() {
-//     gsap.to('.search-empty', { autoAlpha: 1 });
-    
-//     let emptyTl = gsap.timeline(),
-//       emptyResults = new SplitText('.search-empty__results', { type: 'words,chars' }),
-//       emptyText = new SplitText('.search-empty__span', { type: 'words' }),
-//       chars = emptyResults.chars, 
-//       words = emptyText.words;
-
-//     emptyTl.from(chars, {
-//       duration: 0.2,
-//       opacity: 0,
-//       ease: 'none',
-//       stagger: 0.1,
-//     }).from(words, {
-//       duration: 0.8,
-//       x: 40,
-//       opacity: 0,
-//       ease: Power2.easeOut,
-//       stagger: 0.1,
-//     });
-//   }
-
-//   // reset search
-//   function resetSearch() {
-//     document.querySelector('.search-input').value = ''; //clear input
-//     document.querySelector('.search').classList.remove('searched');  
-//     gsap.to('.search-empty', { autoAlpha: 0, duration: 0.2 }); 
-//     //gsap.to('.search [data-animation="stagger"]', { opacity: 0, y: 10 });
-
-//     let activeElements = document.querySelectorAll('.search-result-col[data-visibility="visible"]');
-
-//     activeElements.forEach(el => {
-//       gsap.to(el, { autoAlpha: 0 , duration: 0.3,
-//         onComplete: function() { 
-//           gsap.set(el, { display: 'none' }); 
-//           el.setAttribute('data-visibility', 'hide');
-//         }
-//       });
-//     });
-
-//     gsap.to(projectResults, { autoAlpha: 0 , duration: 0.3,
-//       onComplete: function() { 
-//         gsap.set(projectResults, { display: 'none' }); 
-//         objectsResults.setAttribute('data-visibility', 'hide');
-//       }
-//     });
-
-//     gsap.to(objectsResults, { autoAlpha: 0 , duration: 0.3,
-//       onComplete: function() { 
-//         gsap.set(objectsResults, { display: 'none' }); 
-//         objectsResults.setAttribute('data-visibility', 'hide');
-//       }
-//     });
-//   }
-
-//   // function animateResults() {
-//   //   let resultsElements = document.querySelectorAll('[data-animation="stagger"]');
-
-//   //   console.log(resultsElements)
-
-//   //   resultsElements.forEach((el) => {
-//   //     gsap.to(el, {
-//   //       y: 0,
-//   //       opacity: 2,
-//   //       duration: 6,
-//   //       stagger: 0.5,
-//   //       ease: 'power4',
-//   //     });
-//   //   });      
-//   // }
-// }
 
 /** SEARCH */
 function searchEnter() { //so it works on refresh
