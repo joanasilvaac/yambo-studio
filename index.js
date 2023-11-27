@@ -827,6 +827,8 @@ function projectSrollAnimations() {
       '.proj-1x1-carousel',
       '.proj-1x1-video',
       '.proj-video-loop',
+      '.proj-wide-image', 
+      '.proj-wide-video',
       '.proj-others'
     ];
 
