@@ -655,6 +655,24 @@ function projectsSwiper() {
     }
   });
 
+  new Swiper('.proj-4x5-carousel2__wrapper', {
+    loop: true,
+    slidesPerView: 2.2,
+    spaceBetween: 10,
+    height: 'auto',
+    breakpoints: {
+      768: {
+        spaceBetween: 20,
+        slidesPerView: 2,
+      },
+    },
+    on: {
+      click: function () {
+        this.slideNext();
+      },
+    }
+  });
+
   new Swiper('.proj-1x1-carousel__wrapper', {
     loop: true,
     slidesPerView: 2.2,
@@ -817,6 +835,7 @@ function projectSrollAnimations() {
       '.proj-9x16-gallery2',
       '.proj-9x16-carousel3',
       '.proj-9x16-carousel2',
+      '.proj-9x16-video',
       '.proj-1x1-col3',
       '.proj-1x1-col4',
       '.proj-1x1-col6',
@@ -826,6 +845,12 @@ function projectSrollAnimations() {
       '.proj-1x1-gallery4',
       '.proj-1x1-carousel',
       '.proj-1x1-video',
+      '.proj-4x5-col4',
+      '.proj-4x5-col6',
+      '.proj-4x5-col12',
+      '.proj-4x5-gallery',
+      '.proj-4x5-carousel2',
+      '.proj-4x5-video', 
       '.proj-video-loop',
       '.proj-wide-image', 
       '.proj-wide-video',
