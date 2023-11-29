@@ -12,48 +12,8 @@ lenis.on('scroll', ScrollTrigger.update);
 
 requestAnimationFrame(raf);
 
-// /* Page interactions */
-// gsap.registerPlugin(ScrollTrigger);
-// gsap.registerPlugin(SplitText);
-
-// const revealClients = gsap.utils.toArray('.hero__clients-collection');
-
-// revealClients.forEach((target) => {
-//   const splitLines = new SplitText(target, {
-//     type: 'lines',
-//     linesClass: 'line line++'
-//   });
-
-//   gsap.from(splitLines.lines, {
-//     yPercent: 100,
-//     opacity: 0,
-//     duration: 1,
-//     stagger: 0.15,
-//     ease: 'power4',
-//   });
-// });
-
-// const revealOpacity = document.querySelectorAll("[data-reveal='opacity']")
-
-// revealOpacity.forEach((el) => {
-//   console.log(el)
-//   gsap.from(el, {
-//     opacity: 0,
-//     duration: 0.8,
-//     ease: 'power4',
-//     scrollTrigger: {
-//       trigger: el,
-//       start: 'top bottom-=150',
-//       end: 'bottom bottom',
-//       //markers: true
-//     }
-//   });
-// });
-
-
 
 /* logo interaction */
-//gsap.registerPlugin(SplitText);
 
 let text = new SplitText('.navbar__logo', { type: "chars" }),
   letters = text.chars;
@@ -455,8 +415,6 @@ function homepageHeroDesktop() { //add hover state to clients hero
 
 function homepageHeroMobile() {
   if (window.matchMedia('(max-width: 991px)').matches) {
-    //gsap.registerPlugin(ScrollTrigger);
-
     const clients = document.querySelectorAll('.hero__client-wrapper');
 
     let tl = gsap.timeline({
@@ -754,8 +712,6 @@ function videoComponent() {
 function stickyReturn() { 
   if (window.matchMedia('(min-width: 767px)').matches) { //tablet on only
     setTimeout(() => { //wait for the barbajs finish the transition
-      //gsap.registerPlugin(ScrollTrigger);
-
       let heroButtons = document.querySelector('.project-hero__buttons'),
         backButton = heroButtons.querySelector('.project-hero__back');
 
@@ -977,8 +933,6 @@ function objectsHeroDesktop() {
 function objectsHeroMobile() {
   if (window.matchMedia('(max-width: 991px)').matches) {
     setTimeout(() => { 
-      //gsap.registerPlugin(ScrollTrigger);
-
       const words = document.querySelectorAll('[data-obj-word]');
 
       let tl = gsap.timeline({
@@ -1200,8 +1154,6 @@ function objectsDownload() {
 /** ABOUT */
 function aboutVideo() {
   setTimeout(() => { //wait for the barbajs finish the transition, otherwise the containers would be on top of each other and the start/end point would be calculated wrong
-    //gsap.registerPlugin(ScrollTrigger);
-    
     let videoWrapper = document.querySelector('#aboutVideo'),
       aboutIframe = videoWrapper.querySelector('iframe'),
       aboutVideo = new Vimeo.Player(aboutIframe);
@@ -1347,8 +1299,6 @@ function searchEnter() { //so it works on refresh
 }
 
 function search() { 
-  //gsap.registerPlugin(SplitText);
-
   // prevent form submit
   $('#search-form').submit(function() {
     return false;
