@@ -437,6 +437,28 @@ function homepageHeroMobile() {
   }
 }
 
+function homepageHeroLines() {
+  const homepageHeroText = gsap.utils.toArray('.hero__clients-collection');
+
+  homepageHeroText.forEach((el) => {
+    const splitLines = new SplitText(el, {
+      type: 'lines',
+      linesClass: 'line line++'
+    });
+
+    gsap.from(splitLines.lines, {
+      yPercent: 100,
+      duration: 0.6,
+      opacity: 0,
+      stagger: 0.1,
+      ease: 'power4',
+      onComplete() {
+        gsap.set(splitLines.lines, { clearProps: 'all' });
+      }
+    });
+  });
+}
+
 function projectsIndex() {
   const projects = document.querySelectorAll('.project-index__link'); //get all projects inside the list
   const allAssets = document.querySelectorAll('.project-index__assets'); //get all images/videos
@@ -508,6 +530,7 @@ function projectsIndex() {
     });
   });
 }
+
 
 /** PROJECTS */
 function scrollDownAnimation() {
@@ -765,7 +788,6 @@ function projectsNavigation() {
 
 function projectSrollAnimations() {
   setTimeout(() => {
-    39 
     const sectionsLines = ['.proj-text-col6', '.proj-text-col8', '.proj-text-block'];
 
     const sections = [
