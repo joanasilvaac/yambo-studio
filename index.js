@@ -441,6 +441,9 @@ function homepageHeroLines() {
   const homepageHeroText = gsap.utils.toArray('.hero__clients-collection');
 
   homepageHeroText.forEach((el) => {
+    //const background = el.querySelector('.hero__client-background');
+    //gsap.set(background, { visibility: 'hidden' })
+
     const splitLines = new SplitText(el, {
       type: 'lines',
       linesClass: 'line line++'
@@ -1002,6 +1005,9 @@ function objectsIndex() {
 
     el.addEventListener('mouseover', () => { //no mouseenter
       currentAsset = allAssets[index];
+
+      console.log(`Mouseover on element with index ${index}`);
+
       let iframe = currentAsset.querySelector('iframe'),
         iframeBackground = currentAsset.querySelector('.vimeo-wrapper');
 
