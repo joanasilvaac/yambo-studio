@@ -441,8 +441,8 @@ function homepageHeroLines() {
   const homepageHeroText = gsap.utils.toArray('.hero__clients-collection');
 
   homepageHeroText.forEach((el) => {
-    //const background = el.querySelector('.hero__client-background');
-    //gsap.set(background, { visibility: 'hidden' })
+    // const background = el.querySelector('.hero__client-background');
+    // gsap.set(background, { visibility: 'hidden' });
 
     const splitLines = new SplitText(el, {
       type: 'lines',
@@ -457,6 +457,7 @@ function homepageHeroLines() {
       ease: 'power4',
       onComplete() {
         gsap.set(splitLines.lines, { clearProps: 'all' });
+        //gsap.set(background, { visibility: 'visible' });
       }
     });
   });
@@ -1005,9 +1006,7 @@ function objectsIndex() {
 
     el.addEventListener('mouseover', () => { //no mouseenter
       currentAsset = allAssets[index];
-
-      console.log(`Mouseover on element with index ${index}`);
-
+      
       let iframe = currentAsset.querySelector('iframe'),
         iframeBackground = currentAsset.querySelector('.vimeo-wrapper');
 
