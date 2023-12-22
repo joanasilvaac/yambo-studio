@@ -14,7 +14,6 @@ requestAnimationFrame(raf);
 
 
 /* logo interaction */
-
 let text = new SplitText('.navbar__logo', { type: "chars" }),
   letters = text.chars;
 
@@ -360,6 +359,34 @@ function showScrollbar() {
 }
   
 /** HOMEPAGE */
+function homepageHeroLines() {
+  if (window.matchMedia('(min-width: 992px)').matches) {
+    const homepageHeroText = gsap.utils.toArray('.hero__clients-collection');
+
+    homepageHeroText.forEach((el) => {
+      // const background = el.querySelector('.hero__client-background');
+      // gsap.set(background, { visibility: 'hidden' });
+
+      const splitLines = new SplitText(el, {
+        type: 'lines',
+        linesClass: 'line line++'
+      });
+
+      gsap.from(splitLines.lines, {
+        yPercent: 100,
+        duration: 0.6,
+        opacity: 0,
+        stagger: 0.1,
+        ease: 'power4',
+        onComplete() {
+          gsap.set(splitLines.lines, { clearProps: 'all' });
+          //gsap.set(background, { visibility: 'visible' });
+        }
+      });
+    });
+  }
+}
+
 function homepageHeroDesktop() { //add hover state to clients hero
   if (window.matchMedia('(min-width: 992px)').matches) {
     const clients = document.querySelectorAll('.hero__client-wrapper');
@@ -413,55 +440,29 @@ function homepageHeroDesktop() { //add hover state to clients hero
   }
 }
 
-function homepageHeroMobile() {
-  if (window.matchMedia('(max-width: 991px)').matches) {
-    const clients = document.querySelectorAll('.hero__client-wrapper');
+// function homepageHeroMobile() {
+//   if (window.matchMedia('(max-width: 991px)').matches) {
+//     const clients = document.querySelectorAll('.hero__client-wrapper');
 
-    let tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: '.homepage__hero',
-        pin: true,
-        scrub: 2,
-        anticipatePin: 1,
-        //markers: true,
-      }
-    });
+//     let tl = gsap.timeline({
+//       scrollTrigger: {
+//         trigger: '.homepage__hero',
+//         pin: true,
+//         scrub: 2,
+//         anticipatePin: 1,
+//         //markers: true,
+//       }
+//     });
 
-    clients.forEach((client, i) => {
-      let image = client.querySelector('.hero__client-background');
+//     clients.forEach((client, i) => {
+//       let image = client.querySelector('.hero__client-background');
 
-      tl.to(image, { duration: 2, opacity: 1 }) // Fade in
-        .to(image, { duration: 2, opacity: 0 }, "+=2") // Fade out
-        .to(image, { duration: 0.1, opacity: 0 }); // Ensure the last image is hidden
-   });
-  }
-}
-
-function homepageHeroLines() {
-  const homepageHeroText = gsap.utils.toArray('.hero__clients-collection');
-
-  homepageHeroText.forEach((el) => {
-    // const background = el.querySelector('.hero__client-background');
-    // gsap.set(background, { visibility: 'hidden' });
-
-    const splitLines = new SplitText(el, {
-      type: 'lines',
-      linesClass: 'line line++'
-    });
-
-    gsap.from(splitLines.lines, {
-      yPercent: 100,
-      duration: 0.6,
-      opacity: 0,
-      stagger: 0.1,
-      ease: 'power4',
-      onComplete() {
-        gsap.set(splitLines.lines, { clearProps: 'all' });
-        //gsap.set(background, { visibility: 'visible' });
-      }
-    });
-  });
-}
+//       tl.to(image, { duration: 2, opacity: 1 }) // Fade in
+//         .to(image, { duration: 2, opacity: 0 }, "+=2") // Fade out
+//         .to(image, { duration: 0.1, opacity: 0 }); // Ensure the last image is hidden
+//    });
+//   }
+// }
 
 function projectsIndex() {
   const projects = document.querySelectorAll('.project-index__link'); //get all projects inside the list
@@ -910,6 +911,30 @@ function projectSrollAnimations() {
 
 
 /** OBJECTS */
+function objectsHeroLines() {
+  if (window.matchMedia('(min-width: 992px)').matches) {
+    let objectsHeroText = document.querySelector('.objects-hero__text');
+
+    const splitLines = new SplitText(objectsHeroText, {
+      type: 'lines',
+      linesClass: 'line line++'
+    });
+  
+    gsap.from(splitLines.lines, {
+      yPercent: 100,
+      duration: 0.6,
+      opacity: 0,
+      stagger: 0.1,
+      ease: 'power4',
+      onComplete() {
+        gsap.set(splitLines.lines, { clearProps: 'all' });
+        objectsHeroText.style.color = '#dedede';
+        objectsHeroText.style.mixBlendMode = 'difference';
+      }
+    });
+  }
+}
+
 function objectsHeroDesktop() { 
   document.querySelectorAll("[data-vimeo-poster='true']").forEach(function(componentEl) {
     const iframeEl = componentEl.querySelector("iframe");
@@ -924,7 +949,7 @@ function objectsHeroDesktop() {
   if (window.matchMedia('(min-width: 992px)').matches) {
     const heroWords = document.querySelectorAll('[data-obj-word]');
     const images = document.querySelectorAll('[data-obj-image]');
-    let activeImage = images[0]; // select the activeImage = active asset, start with first one (its called image cause it wasnt suppose to have video initially)
+    let activeImage = images[1]; // select the activeImage = active asset, start with first one (its called image cause it wasnt suppose to have video initially)
 
     if (activeImage) {
       activeImage.classList.add('active'); //show current asset
