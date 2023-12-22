@@ -440,29 +440,29 @@ function homepageHeroDesktop() { //add hover state to clients hero
   }
 }
 
-// function homepageHeroMobile() {
-//   if (window.matchMedia('(max-width: 991px)').matches) {
-//     const clients = document.querySelectorAll('.hero__client-wrapper');
+function homepageHeroMobile() {
+  if (window.matchMedia('(max-width: 991px)').matches) {
+    const clients = document.querySelectorAll('.hero__client-wrapper');
 
-//     let tl = gsap.timeline({
-//       scrollTrigger: {
-//         trigger: '.homepage__hero',
-//         pin: true,
-//         scrub: 2,
-//         anticipatePin: 1,
-//         //markers: true,
-//       }
-//     });
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.homepage__hero',
+        pin: true,
+        scrub: 2,
+        anticipatePin: 1,
+        //markers: true,
+      }
+    });
 
-//     clients.forEach((client, i) => {
-//       let image = client.querySelector('.hero__client-background');
+    clients.forEach((client, i) => {
+      let image = client.querySelector('.hero__client-background');
 
-//       tl.to(image, { duration: 2, opacity: 1 }) // Fade in
-//         .to(image, { duration: 2, opacity: 0 }, "+=2") // Fade out
-//         .to(image, { duration: 0.1, opacity: 0 }); // Ensure the last image is hidden
-//    });
-//   }
-// }
+      tl.to(image, { duration: 2, opacity: 1 }) // Fade in
+        .to(image, { duration: 2, opacity: 0 }, "+=2") // Fade out
+        .to(image, { duration: 0.1, opacity: 0 }); // Ensure the last image is hidden
+   });
+  }
+}
 
 function projectsIndex() {
   const projects = document.querySelectorAll('.project-index__link'); //get all projects inside the list
