@@ -230,6 +230,8 @@ function loading() {
     window.addEventListener('load', () => {
       loadFlag = true; // set the flag to true when 'load' event occurs
     });
+  } else if (document.querySelector('.loading') && Cookies.get('loading')) {
+    document.querySelector('.loading').style.display = 'none'; 
   }
 }
 
