@@ -152,7 +152,7 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
 
 /** LOADING */
 function loading() {
-  if (document.querySelector('.loading')) {
+  if (document.querySelector('.loading') && !Cookies.get('loading')) {
     const loadingInfo = document.querySelector('.loading-info'),
       loadingText = document.querySelector('.loading-text'),
       splitText = new SplitText(loadingText, { type: 'words,chars' }),
@@ -161,7 +161,8 @@ function loading() {
 
     let chars = splitText.chars,
       loadingTimeline = gsap.timeline(),
-      initialPercentage = 0;
+      initialPercentage = 0,
+      loadFlag;
 
     gsap.set(loadingInfo, { opacity: 1 });
 
@@ -210,6 +211,9 @@ function loading() {
         duration: 0.6,
         ease: Power1.easeOut,
       }).to('.loading', {
+        opacity: '0',
+        duration: 0.3,
+      }).to('.loading', {
         display: 'none',
       });
     }
@@ -219,6 +223,7 @@ function loading() {
       if (loadFlag) {
         clearInterval(percentageInterval);
         finishLoadingAnimation();
+        Cookies.set('loading', true);
       }
     }, 5000);
 
@@ -440,29 +445,29 @@ function homepageHeroDesktop() { //add hover state to clients hero
   }
 }
 
-function homepageHeroMobile() {
-  if (window.matchMedia('(max-width: 991px)').matches) {
-    const clients = document.querySelectorAll('.hero__client-wrapper');
+// function homepageHeroMobile() {
+//   if (window.matchMedia('(max-width: 991px)').matches) {
+//     const clients = document.querySelectorAll('.hero__client-wrapper');
 
-    let tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: '.homepage__hero',
-        pin: true,
-        scrub: 2,
-        anticipatePin: 1,
-        //markers: true,
-      }
-    });
+//     let tl = gsap.timeline({
+//       scrollTrigger: {
+//         trigger: '.homepage__hero',
+//         pin: true,
+//         scrub: 2,
+//         anticipatePin: 1,
+//         //markers: true,
+//       }
+//     });
 
-    clients.forEach((client, i) => {
-      let image = client.querySelector('.hero__client-background');
+//     clients.forEach((client, i) => {
+//       let image = client.querySelector('.hero__client-background');
 
-      tl.to(image, { duration: 2, opacity: 1 }) // Fade in
-        .to(image, { duration: 2, opacity: 0 }, "+=2") // Fade out
-        .to(image, { duration: 0.1, opacity: 0 }); // Ensure the last image is hidden
-   });
-  }
-}
+//       tl.to(image, { duration: 2, opacity: 1 }) // Fade in
+//         .to(image, { duration: 2, opacity: 0 }, "+=2") // Fade out
+//         .to(image, { duration: 0.1, opacity: 0 }); // Ensure the last image is hidden
+//    });
+//   }
+// }
 
 function projectsIndex() {
   const projects = document.querySelectorAll('.project-index__link'); //get all projects inside the list
