@@ -396,8 +396,15 @@ function homepageHeroLines() {
 
 function homepageHeroDesktop() { //add hover state to clients hero
   if (window.matchMedia('(min-width: 992px)').matches) {
+    //the hover effect to not trigger the "sensitive" area with css
+    $('.hero__client-link').hover(function() {
+      $('.hero__client-link').not(this).addClass('inactive');
+    }, function() {
+      $('.hero__client-link').removeClass('inactive');
+    });
+
     const clients = document.querySelectorAll('.hero__client-wrapper');
-    
+  
     clients.forEach((el) => {
       let clientName = el.querySelector('.hero__client-text');
 
@@ -1346,13 +1353,24 @@ function locationHover() {
   }
 }
 
+function firstSeactionActive() {
+  document.addEventListener('DOMContentLoaded', function() {
+    let firstSection = document.querySelector('[data-trigger="hover"]');
+
+    if (firstSection) {
+      let event = new Event('mouseover');
+      firstSection.dispatchEvent(event);
+    }
+  })
+}
+
 /** SEARCH */
 function searchEnter() { //so it works on refresh
   setTimeout(function() {
     document.querySelector('.search-input__wrapper').classList.add('active');  
 
     setTimeout(function() {
-        document.getElementById('search').focus();
+      document.getElementById('search').focus();
     }, 600);
   }, 800);
 }
