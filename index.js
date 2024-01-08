@@ -740,21 +740,23 @@ function videoComponent() {
     const coverEl = componentEl.querySelector("[js-vimeo-element='cover']");
     const coverImage = componentEl.querySelector("[js-vimeo-element='media']");
     const timeline =  componentEl.querySelector(".proj-video-timeline");
+    let hideCover = false;
 
     let player = new Vimeo.Player(iframeEl);
-  
+
     player.on("play", function() {
-      coverEl.style.cssText = "opacity: 0;";
-      coverImage.style.cssText = "opacity: 0";
       componentEl.classList.add("is-playing");
     });
 
-    player.on("pause", function() {
-      coverEl.style.cssText = "opacity: 1;";
+    player.on("pause", function() {      
       componentEl.classList.remove("is-playing");
+      coverEl.style.cssText = "opacity: 1;";
     });
 
     coverEl.addEventListener("click", function() { // when clicking the cover 
+      coverEl.style.cssText = "opacity: 0;";
+      coverImage.style.cssText = "opacity: 0";
+
       if (componentEl.classList.contains("is-playing")) {
         player.pause();
       } else {
