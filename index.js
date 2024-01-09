@@ -3,14 +3,30 @@ const remToPixels = (rem) => rem * 16;
 /* Smooth scroll */
 const lenis = new Lenis();
 
-function raf(time) {
-  lenis.raf(time)
-  requestAnimationFrame(raf)
-}
+// function raf(time) {
+//   lenis.raf(time)
+//   requestAnimationFrame(raf)
+// }
+
+// lenis.on('scroll', ScrollTrigger.update);
+
+// requestAnimationFrame(raf);
+
+
+// const lenis = new Lenis({
+//   smoothWheel: true,
+//   duration: 1.2 
+// });
 
 lenis.on('scroll', ScrollTrigger.update);
 
-requestAnimationFrame(raf);
+gsap.ticker.add((time) => {
+  lenis.raf(time * 1000);
+});
+
+gsap.ticker.lagSmoothing(0);
+
+
 
 
 /* logo interaction */
@@ -954,43 +970,51 @@ function projectSrollAnimations() {
 /** OBJECTS */
 function objectsHeroLines() {
   if (window.matchMedia('(min-width: 992px)').matches) {
-    let objectsHeroText = document.querySelector('.objects-hero__text');
+    document.fonts.ready.then(function () {
+      let objectsHeroText = document.querySelector('.objects-hero__text');
 
-    const splitLines = new SplitText(objectsHeroText, {
-      type: 'lines',
-      linesClass: 'line line++'
-    });
-  
-    gsap.from(splitLines.lines, {
-      yPercent: 100,
-      duration: 0.6,
-      opacity: 0,
-      stagger: 0.1,
-      ease: 'power4',
-      onComplete() {
-        gsap.set(splitLines.lines, { clearProps: 'all' });
-        objectsHeroText.style.color = '#dedede';
-        objectsHeroText.style.mixBlendMode = 'difference';
-      }
+      const splitLines = new SplitText(objectsHeroText, {
+        type: 'lines',
+        linesClass: 'line line++'
+      });
+    
+      gsap.from(splitLines.lines, {
+        yPercent: 100,
+        duration: 0.5,
+        opacity: 0,
+        stagger: 0.1,
+        ease: [.25,0,.15,1],
+        onComplete() {
+          gsap.set(splitLines.lines, { clearProps: 'all' });
+          objectsHeroText.style.color = '#dedede';
+          objectsHeroText.style.mixBlendMode = 'difference';
+
+          document.querySelectorAll('.objects-index__text--areas').forEach(function(el) {
+            el.classList.add('obj-areas-underline');
+          });
+        }
+      });
     });
   }
 }
 
 function objectsHeroDesktop() { 
-  document.querySelectorAll("[data-vimeo-poster='true']").forEach(function(componentEl) {
-    const iframeEl = componentEl.querySelector("iframe");
+  //when videos are ready, show the container
+  document.querySelectorAll('.objects-hero__assets .vimeo-wrapper').forEach(function(componentEl) {
+    const iframeEl = componentEl.querySelector('iframe');
+    const wrapper = document.querySelector('.objects-hero__assets');
     let player = new Vimeo.Player(iframeEl);
 
-    player.on("play", function() {
+    player.on('play', function() {
       iframeEl.style.opacity = 1;
-      componentEl.querySelector('.vimeo-wrapper').style.background = 'transparent';
+      wrapper.style.opacity = 1;
     });
-	}) 
+	});
   
   if (window.matchMedia('(min-width: 992px)').matches) {
     const heroWords = document.querySelectorAll('[data-obj-word]');
-    const images = document.querySelectorAll('[data-obj-image]');
-    let activeImage = images[1]; // select the activeImage = active asset, start with first one (its called image cause it wasnt suppose to have video initially)
+    const images = document.querySelectorAll('[data-obj-video]');
+    let activeImage = images[0]; // select the activeImage = active asset, start with first one (its called image cause it wasnt suppose to have video initially)
 
     if (activeImage) {
       activeImage.classList.add('active'); //show current asset
@@ -1009,7 +1033,7 @@ function objectsHeroDesktop() {
     heroWords.forEach(function(word) {
       word.addEventListener('mouseenter', function() {
         let code = this.getAttribute('data-obj-word');
-        let imageEl = document.querySelector('[data-obj-image="' + code + '"]'); 
+        let imageEl = document.querySelector('[data-obj-video="' + code + '"]'); 
 
         if (imageEl && imageEl !== activeImage) {
           activeImage.classList.remove('active'); //remove previous active img
@@ -1038,7 +1062,7 @@ function objectsHeroMobile() {
 
       words.forEach((word, i) => {
         let code = word.getAttribute('data-obj-word'),
-          image = document.querySelector('[data-obj-image="' + code + '"]');
+          image = document.querySelector('[data-obj-video="' + code + '"]');
 
         tl.to(word, { duration: 1, opacity: 1 })
           .to(image, { duration: 2, opacity: 1, scale: 1.02, x: gsap.utils.random(-5, 5), y: gsap.utils.random(-10, 10), ease: 'power2.inOut' }, "-=1") 
