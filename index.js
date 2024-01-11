@@ -276,7 +276,7 @@ function customCursors() {
   const cursors = document.querySelector('.cursor-wrapper');
   const customCursors = document.querySelectorAll('[data-cursor]');
 
-  document.querySelectorAll('a, button, [data-cursor-hover="true"], .proj-16x9-video, .proj-1x1-video').forEach(element => {
+  document.querySelectorAll('a, button, [data-cursor-hover="true"], .proj-16x9-video, .proj-1x1-video, [data-animation-type="spline"]').forEach(element => {
     element.addEventListener('mouseenter', () => {
       cursors.style.opacity = '0';
     });
@@ -979,11 +979,11 @@ function objectsHeroLines() {
       });
     
       gsap.from(splitLines.lines, {
-        yPercent: 100,
-        duration: 0.5,
+        yPercent: 60,
         opacity: 0,
-        stagger: 0.1,
-        ease: [.25,0,.15,1],
+        duration: 0.5,
+        stagger: 0.08,
+        ease: [.4, 0, 0, 1],
         onComplete() {
           gsap.set(splitLines.lines, { clearProps: 'all' });
           objectsHeroText.style.color = '#dedede';
@@ -1171,57 +1171,59 @@ function objectsIndex() {
 }
 
 function objectsSwiper() {
-  const breakpoint = window.matchMedia( '(max-width:767px)' );
+  let objectsSwiper;
 
-  let objectsSwiper; 
+  objectsSwiper = new Swiper('.objects-carousel__wrapper', {
+    slidesPerView: 'auto',
+    spaceBetween: remToPixels(1.25),
+    freeMode: true,
+    mousewheel: {
+      enabled: true,
+      sensitivity: 4,
+    },
+    on: {
+      init: function () {
+        let slidesInView = [
+          this.slides[0],
+          this.slides[1],
+          this.slides[2]
+        ];
 
-  const breakpointChecker = function() {
-    if ( breakpoint.matches === true ) {
-	    if ( objectsSwiper !== undefined ) objectsSwiper.destroy( true, true );
-	    return;
-    } else if ( breakpoint.matches === false ) { // else if a small viewport and single column layout needed
-      const functionsToExecute = [enableSwiper, horizontalScroll];
+        gsap.to(slidesInView, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'cubic-bezier(.25, 0, .15, 1)',
+        });
+      },
+      slideChange: function () {
+        let currentSlide = this.slides[this.activeIndex + 2];
 
-      functionsToExecute.forEach((func) => {
-        if (typeof func === 'function') {
-          func(); // Call the function
-        }
-      });
+        gsap.to(currentSlide, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'cubic-bezier(.25, 0, .15, 1)',
+        });
+      },
+    },
+  });
+
+  const breakpointChecker = function () {
+    if (window.innerWidth <= 767) { //below 767px
+      objectsSwiper.destroy(true, true);
+    } else {
+      objectsSwiper.init();
     }
   };
 
-  const enableSwiper = function() {
-    objectsSwiper = new Swiper('.objects-carousel__wrapper', {
-      direction: 'horizontal',
-      slidesPerView: 'auto',
-      freeMode: true,
-      spaceBetween: remToPixels(1.25), 
-      mousewheel: true,
-    });
-  };
+  //keep an eye on viewport size changes
+  window.addEventListener('resize', breakpointChecker);
 
-  // keep an eye on viewport size changes
-  breakpoint.addListener(breakpointChecker);
-
-  // kickstart
+  //kickstart
   breakpointChecker();
-
-  //enable horizontal scroll with lenis
-  function horizontalScroll() {
-    let sectionPin = document.querySelector('.objects-carousel__wrapper');
-
-    let containerAnimation = gsap.to(sectionPin, {
-      scrollTrigger: {
-        trigger: '.main-wrapper[data-barba-namespace="objects-single"]',
-        start: 'top top',
-        end: () => "+=" + sectionPin.offsetWidth,
-        pin: true,
-        scrub: true,
-      },
-      ease: 'none'
-    });
-  }
-}
+};
 
 function animateEnquire() {
   let enquireTl = gsap.timeline(),
