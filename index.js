@@ -1,3 +1,448 @@
+/* disable scroll */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.menu-toggle').forEach(trigger => {
+    trigger.addEventListener('click', function(){ 
+      this.x = ((this.x || 0) + 1)%2; 
+      if(this.x){ 
+        document.querySelectorAll('body').forEach(target => target.classList.add('disable-scroll'));
+      }
+      else{ 
+        document.querySelectorAll('body').forEach(target => target.classList.remove('disable-scroll'));
+      } 
+    });
+  });
+});
+
+
+/* cookie banner */
+let cookieBanner = document.querySelector('.cookie-banner'), 
+    cookieButton = document.querySelector('.cookie-banner__button');
+
+document.addEventListener('DOMContentLoaded', function() {
+	if(cookieBanner) {
+    if (Cookies.get('cookieBannerDismissed')) {
+      cookieBanner.parentNode.removeChild(cookieBanner);
+    } else {
+      cookieBanner.style.pointerEvents = 'all';
+      cookieBanner.style.opacity = '1';
+    }
+
+    cookieButton.addEventListener('click', function() {
+      cookieBanner.style.opacity = '0';
+
+      setTimeout(() => {
+        cookieBanner.parentNode.removeChild(cookieBanner);
+        Cookies.set('cookieBannerDismissed', true);
+      }, '300');
+    });
+  }
+});
+  
+
+/* reload automatically */
+let resizeTimeout;
+
+function debounce(func, delay) {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(func, delay);
+}
+
+function onWindowResize() {
+  stickyReturn();
+  homepageHeroDesktop();
+  //homepageHeroMobile();
+  objectsHeroDesktop();
+  objectsHeroMobile();
+  objectsSwiper();
+}
+
+window.addEventListener('resize', function () {
+  debounce(onWindowResize, 1000); // 1000 milliseconds (1 second) delay
+});
+
+
+/* register the gsap plugins */
+gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(SplitText);
+  
+const cleanGSAP = () => {
+	ScrollTrigger.getAll().forEach(t => t.kill(false));
+	ScrollTrigger.refresh();
+};
+
+barba.hooks.beforeEnter(function() { //only things that are common to all pages
+  cleanGSAP()
+  customCursors()
+	currentYear()
+})
+   
+barba.hooks.after(function(data) {
+  resetWebflow(data); 
+});
+
+let scrollY = 0;
+  
+barba.init({
+  views: [{
+    namespace: 'home',
+    beforeEnter() {
+      loading()
+      homepageHeroDesktop()
+      //homepageHeroMobile()
+      homepageHeroLines()
+      projectsIndex()
+    }
+  }, {
+    namespace: 'projects',
+    beforeEnter() {
+      iframePoster()
+      stickyReturn()
+      projectsSwiper()
+      scrollDownAnimation()
+      videoComponent()
+    }, 
+    afterEnter() {
+      projectsNavigation()
+      projectSrollAnimations()
+    }
+  }, {
+    namespace: 'about',
+    beforeEnter() {
+      iframePoster()
+      aboutIndexes()
+      locationHover()
+      firstSeactionActive()
+    }, 
+    afterEnter() {
+      aboutVideo()
+    }
+  }, {
+    namespace: 'objects',
+    beforeEnter() {
+      iframePoster()
+      objectsHeroDesktop()
+      objectsHeroMobile()
+      objectsHeroLines()
+      objectsIndex()
+      objectsEnquire()
+    }, 
+  },{
+    namespace: 'objects-single',
+    beforeEnter() {
+      iframePoster()
+      objectsSwiper()
+      objectsDownload()
+      carouselAnimation()
+    }, 
+  }, {
+    namespace: 'search',
+    beforeEnter() {
+      searchEnter()
+      search()
+    }
+  }, {
+    namespace: 'error',
+    beforeEnter() {
+      errorPage()
+    }
+  }],
+  transitions: [
+  {
+    preventRunning: true, //don't run animations on top of each other
+    cacheIgnore: true,
+    name: 'default-transition',
+    leave(data) {
+      return gsap.to(data.current.container, {
+        opacity: 0
+      });
+    },
+    enter(data) {
+      gsap.defaults({
+        ease: 'power2.inOut',
+        duration: 1,
+      });
+  
+      data.next.container.classList.add('fixed');
+      
+	    showScrollbar(); //show scrollbar, hidden on objects carousel
+      
+      //reveal page 
+      return gsap.fromTo(
+        data.next.container,
+        { opacity: 0 }, 
+        {	
+          opacity: 1, 
+          onStart: () => {
+            window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'smooth'
+            });
+          },
+          onComplete: () => {
+            data.next.container.classList.remove('fixed');
+          }
+        }
+      );
+    }
+  },
+  {
+    preventRunning: true, //don't run animations on top of each other
+    name: 'project-enter',
+    from: { 
+      namespace: ['home']
+    },
+    to: { 
+      namespace: ['projects']
+    },
+    leave(data) {
+      scrollY = barba.history.current.scroll.y;
+
+      return gsap.to(data.current.container, {
+        opacity: 0
+      });
+    },
+    enter(data) {
+      gsap.defaults({
+        ease: 'power2.inOut',
+        duration: 1,
+      });
+  
+      data.next.container.classList.add('fixed');
+      
+      //reveal page 
+      return gsap.fromTo(
+        data.next.container,
+        { opacity: 0 }, 
+        {	
+          opacity: 1, 
+          onStart: () => {
+            window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'smooth'
+            });
+          },
+          onComplete: () => {
+            data.next.container.classList.remove('fixed');
+          }
+        }
+      );
+    }
+  },
+  {
+    preventRunning: true, //don't run animations on top of each other
+    name: 'project-leave',
+    from: { 
+      namespace: ['projects']
+    },
+    to: { 
+      namespace: ['home']
+    },
+    leave(data) {
+      return gsap.to(data.current.container, {
+        opacity: 0,
+        display: 'none' //so you can see the new container opacity changing without position fixed
+      });
+    },
+    enter(data) {
+      gsap.defaults({
+        ease: 'power2.inOut',
+        duration: 1,
+      });
+
+      //reveal page 
+      return gsap.fromTo(
+        data.next.container,
+        { opacity: 0 }, 
+        {	
+          opacity: 1, 
+          onStart: () => {
+            window.scrollTo({
+              top: scrollY,
+              left: 0,
+
+            });
+          },
+        }
+      );
+    }
+  }, 
+	{
+    preventRunning: true, //don't run animations on top of each other
+      name: 'objects-enter',
+      from: { 
+        namespace: ['objects']
+      },
+      to: { 
+        namespace: ['objects-single']
+      },
+      leave(data) {
+        scrollY = barba.history.current.scroll.y;
+      
+        return gsap.to(data.current.container, {
+          opacity: 0
+        });
+      },
+      enter(data) {
+        gsap.defaults({
+          ease: 'power2.inOut',
+          duration: 1,
+        });  
+    
+        data.next.container.classList.add('fixed');
+        
+        hideScrollbar(); //hide scrollbar
+        
+        //reveal page 
+        return gsap.fromTo(
+          data.next.container,
+          { opacity: 0 }, 
+          {	
+            opacity: 1, 
+            onStart: () => {
+              window.scrollTo({
+                top: 0,
+                left: 0,
+              });
+            },
+            onComplete: () => {
+              data.next.container.classList.remove('fixed');
+            }
+          }
+        );
+      }
+    },
+    {
+      preventRunning: true, //don't run animations on top of each other
+      name: 'objects-leave',
+      from: { 
+        namespace: ['objects-single']
+      },
+      to: { 
+        namespace: ['objects']
+      },
+      leave(data) {
+        return gsap.to(data.current.container, {
+          opacity: 0,
+          display: 'none' //so you can see the new container opacity changing without position fixed
+        });
+      },
+      enter(data) {
+        gsap.defaults({
+          ease: 'power2.inOut',
+          duration: 1,
+        });
+  
+        //reveal page 
+        return gsap.fromTo(
+          data.next.container,
+          { opacity: 0 }, 
+          {	
+            opacity: 1, 
+            onStart: () => {
+              window.scrollTo({
+                top: scrollY,
+                left: 0,
+  
+              });
+            },
+          }
+        );
+      }
+    }, 
+    {
+      preventRunning: true, //don't run animations on top of each other
+      name: 'search-enter',
+      to: { 
+        namespace: ['search']
+      },
+      leave(data) {
+        return gsap.to(data.current.container, {
+          opacity: 0
+        });
+      },
+      enter(data) {  
+        gsap.defaults({
+          ease: 'power2.inOut',
+          duration: 1,
+        });
+    
+        data.next.container.classList.add('fixed');
+        document.querySelector('.navbar__search').classList.add('clickable-off'); //so you can't trigger the page again
+        
+        //reveal page 
+        return gsap.fromTo(
+          data.next.container,
+          { opacity: 0 }, 
+          {	
+            opacity: 1, 
+            onStart: () => {
+              window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'smooth'
+              });
+            },
+            onComplete: () => {
+              data.next.container.classList.remove('fixed');
+            }
+          }
+        );
+      }
+    },
+    {
+      preventRunning: true, //don't run animations on top of each other
+      name: 'search-leave',
+      from: { 
+        namespace: ['search']
+      },
+      leave(data) {    
+        document.querySelector('.search-leave-animation').click();
+
+        return gsap.to(data.current.container, {
+          opacity: 0, 
+          y: -50,
+          onComplete: () => {
+            document.querySelector('.search-input__wrapper').classList.remove('active');
+            document.querySelector('.navbar__search').classList.remove('clickable-off');
+          }
+        });
+      },
+      enter(data) {
+        gsap.defaults({
+          ease: 'power2.inOut',
+          duration: 1
+        });
+    
+        data.next.container.classList.add('fixed');
+        
+        //reveal page 
+        return gsap.fromTo(
+          data.next.container,
+          { opacity: 0 }, 
+          {	
+            opacity: 1, 
+            onStart: () => {
+              window.scrollTo({
+              top: 0,
+              left: 0,
+              behavior: 'smooth'
+              });
+            },
+            onComplete: () => {
+              data.next.container.classList.remove('fixed');
+            }
+          }
+        );
+      }
+    }
+  ]
+});
+
+
+/** ---- until here it was directly on custom code ---- */
+
 const remToPixels = (rem) => rem * 16;
 
 /* Smooth scroll */
@@ -25,8 +470,6 @@ gsap.ticker.add((time) => {
 });
 
 gsap.ticker.lagSmoothing(0);
-
-
 
 
 /* logo interaction */
