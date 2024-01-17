@@ -64,6 +64,7 @@ window.addEventListener('resize', function () {
 /* register the gsap plugins */
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(SplitText);
+gsap.registerPlugin(CustomEase);
   
 const cleanGSAP = () => {
 	ScrollTrigger.getAll().forEach(t => t.kill(false));
@@ -471,7 +472,6 @@ gsap.ticker.add((time) => {
 
 gsap.ticker.lagSmoothing(0);
 
-
 /* logo interaction */
 let text = new SplitText('.navbar__logo', { type: "chars" }),
   letters = text.chars;
@@ -609,14 +609,43 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
   });
 });
 
+
+/* Typing hover interaction */ 
+const hoverEls = document.querySelectorAll('[data-hover="type"]');
+      
+hoverEls.forEach((element) => {
+  let splitText = new SplitText(element, { type: 'words,chars' });
+  let chars = splitText.chars;
+
+  let elementTimeline = gsap.timeline({ paused: true });
+  elementTimeline.addLabel('start');
+
+  element.addEventListener('mouseenter', () => {
+    if (!elementTimeline.isActive()) {
+      elementTimeline.clear().seek('start'); //so it always finishes
+
+      elementTimeline.from(chars, {
+        duration: 0.5,
+        opacity: 0,
+        ease: 'none',
+        stagger: 0.05,
+      });
+
+      elementTimeline.play();
+    }
+  });
+});
+
 /** LOADING */
 function loading() {
-  if (document.querySelector('.loading') && !Cookies.get('loading')) {
+  let loading = document.querySelector('.loading');
+
+  if (loading && !Cookies.get('loading')) {
     const loadingInfo = document.querySelector('.loading-info'),
       loadingText = document.querySelector('.loading-text'),
       splitText = new SplitText(loadingText, { type: 'words,chars' }),
-      loadingPercentage = document.querySelector('.loading-percentage'),
-      loadingBackground = document.querySelector('.loading-background');
+      blinkingSpan = document.querySelector('.loading .loading-span'),
+      loadingPercentage = document.querySelector('.loading-percentage');
 
     let chars = splitText.chars,
       loadingTimeline = gsap.timeline(),
@@ -625,19 +654,25 @@ function loading() {
 
     gsap.set(loadingInfo, { opacity: 1 });
 
-    loadingTimeline.to(loadingBackground, {
-      y: 0,
-      duration: 0.6,
-      ease: Power1.easeOut,
+    loadingTimeline.to(blinkingSpan, {
+      width: '1rem',
+      duration: 0.25,
+      ease: CustomEase.create('blinking-line', '.25, 0, .15, 1'),
+      transformOrigin: 'left',
+      onComplete() {
+        blinkingSpan.classList.add('blinking-span')
+      }
     }).from(chars, {
-      duration: 0.03,
+      duration: 0.05,
       opacity: 0,
-      stagger: 0.05,
+      stagger: 0.1,
+      delay: 0.5,
     }).fromTo(loadingPercentage,
       { opacity: 0 },
       {
         opacity: 1,
-        duration: 0.2,
+        duration: 0.25,
+        ease: 'blinking-line',
       }
     );
 
@@ -661,18 +696,12 @@ function loading() {
           currentPercentage = Math.round(gsap.getProperty(loadingPercentage, 'textContent'));
           loadingPercentage.textContent = currentPercentage + '%';
         },
-      }).to(loadingInfo, {
-        opacity: 0,
-        duration: 0.6,
-        ease: Power2.easeOut,
-      }).to(loadingBackground, {
+      }).to(loading, {
         yPercent: -100,
-        duration: 0.6,
-        ease: Power1.easeOut,
-      }).to('.loading', {
-        opacity: '0',
-        duration: 0.3,
-      }).to('.loading', {
+        duration: 1,
+        delay: 0.25,
+        ease: CustomEase.create('loading-out', '.85,0,.75,1'),
+      }).to(loading, {
         display: 'none',
       });
     }
@@ -962,7 +991,7 @@ function projectsIndex() {
     gsap.to(assetContainer, {
       autoAlpha: 1,
       duration: 0.25,
-      ease: 'cubic-bezier(.25, 0, .15, 1)',
+      ease: 'blinking-line',
     });
   });
 
@@ -970,7 +999,7 @@ function projectsIndex() {
     gsap.to(assetContainer, {
       autoAlpha: 0,
       duration: 0.25,
-      ease: 'cubic-bezier(.25, 0, .15, 1)',
+      ease: 'blinking-line',
     });
   })
 
@@ -990,7 +1019,7 @@ function projectsIndex() {
         gsap.to(currentAsset, {
           scale: 1.05,  
           duration: 0.5,
-          ease: 'cubic-bezier(0,0,0,1)',
+          ease: CustomEase.create('asset-index', '0,0,0,1'),
         });
 
         if (iframe && iframe.dataset.videoId) {
@@ -1021,7 +1050,7 @@ function projectsIndex() {
         autoAlpha: 0,
         scale: 1,
         duration: 0.5,
-        ease: 'cubic-bezier(0,0,0,1)',
+        ease: 'asset-index',
       });
 
       if (iframe && iframe.dataset.videoId && isVideoPlaying) {
@@ -1542,7 +1571,7 @@ function objectsIndex() {
     gsap.to(assetContainer, {
       autoAlpha: 1,
       duration: 0.25,
-      ease: 'cubic-bezier(.25, 0, .15, 1)',
+      ease: 'blinking-line',
     });
   });
 
@@ -1550,7 +1579,7 @@ function objectsIndex() {
     gsap.to(assetContainer, {
       autoAlpha: 0,
       duration: 0.25,
-      ease: 'cubic-bezier(.25, 0, .15, 1)',
+      ease: 'blinking-line',
     });
   })
 
@@ -1569,7 +1598,7 @@ function objectsIndex() {
         gsap.to(currentAsset, {
           scale: 1.05,  
           duration: 0.5,
-          ease: 'cubic-bezier(0,0,0,1)',
+          ease: 'asset-index',
         });
 
         if (iframe && iframe.dataset.videoId) {
@@ -1600,7 +1629,7 @@ function objectsIndex() {
         autoAlpha: 0,
         scale: 1,
         duration: 0.5,
-        ease: 'cubic-bezier(0,0,0,1)',
+        ease: 'asset-index',
       });
 
       if (iframe && iframe.dataset.videoId && isVideoPlaying) {
@@ -1637,7 +1666,7 @@ function objectsSwiper() {
           y: 0,
           duration: 0.6,
           stagger: 0.1,
-          ease: 'cubic-bezier(.25, 0, .15, 1)',
+          ease: 'blinking-line',
         });
       },
       slideChange: function () {
@@ -1647,7 +1676,7 @@ function objectsSwiper() {
           autoAlpha: 1,
           y: 0,
           duration: 0.6,
-          ease: 'cubic-bezier(.25, 0, .15, 1)',
+          ease: 'blinking-line',
         });
       },
     },
@@ -1792,7 +1821,7 @@ function aboutIndexes() {
       gsap.to(assetContainer, {
         autoAlpha: 1,
         duration: 0.25,
-        ease: 'cubic-bezier(.25, 0, .15, 1)',
+        ease: 'blinking-line',
       });
     });
 
@@ -1800,7 +1829,7 @@ function aboutIndexes() {
       gsap.to(assetContainer, {
         autoAlpha: 0,
         duration: 0.25,
-        ease: 'cubic-bezier(.25, 0, .15, 1)',
+        ease: 'blinking-line',
       });
     })
 
@@ -1821,7 +1850,7 @@ function aboutIndexes() {
           gsap.to(currentAsset, {
             scale: 1.05,  
             duration: 0.5,
-            ease: 'cubic-bezier(0,0,0,1)',
+            ease: 'asset-index',
           });
 
           if (iframe && iframe.dataset.videoId) {
@@ -1852,7 +1881,7 @@ function aboutIndexes() {
           autoAlpha: 0,
           scale: 1,
           duration: 0.5,
-          ease: 'cubic-bezier(0,0,0,1)',
+          ease: 'asset-index',
         });
 
         if (iframe && iframe.dataset.videoId && isVideoPlaying) {
@@ -1906,7 +1935,7 @@ function firstSeactionActive() {
 
     if (firstSection) {
       let event = new Event('mouseover');
-      firstSection.dispatchEvent(event);
+      firstSection.focus();
     }
   })
 }
