@@ -78,7 +78,8 @@ barba.hooks.beforeEnter(function() { //only things that are common to all pages
 })
    
 barba.hooks.after(function(data) {
-  resetWebflow(data); 
+  resetWebflow(data);
+  hoverTyping();
 });
 
 let scrollY = 0;
@@ -112,7 +113,7 @@ barba.init({
       iframePoster()
       aboutIndexes()
       locationHover()
-      firstSeactionActive()
+      //firstSeactionActive()
     }, 
     afterEnter() {
       aboutVideo()
@@ -611,30 +612,35 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
 
 
 /* Typing hover interaction */ 
-const hoverEls = document.querySelectorAll('[data-hover="type"]');
-      
-hoverEls.forEach((element) => {
-  let splitText = new SplitText(element, { type: 'words,chars' });
-  let chars = splitText.chars;
+function hoverTyping() {
+  const hoverEls = document.querySelectorAll('[data-hover="type"]');
+        
+  hoverEls.forEach((element) => {
+    let splitText = new SplitText(element, { type: 'words,chars' });
+    let chars = splitText.chars;
 
-  let elementTimeline = gsap.timeline({ paused: true });
-  elementTimeline.addLabel('start');
+    let elementTimeline = gsap.timeline({ paused: true });
+    elementTimeline.addLabel('start');
 
-  element.addEventListener('mouseenter', () => {
-    if (!elementTimeline.isActive()) {
-      elementTimeline.clear().seek('start'); //so it always finishes
+    element.addEventListener('mouseenter', () => {
+      if (!elementTimeline.isActive()) {
+        elementTimeline.clear().seek('start'); //so it always finishes
 
-      elementTimeline.from(chars, {
-        duration: 0.5,
-        opacity: 0,
-        ease: 'none',
-        stagger: 0.05,
-      });
+        elementTimeline.from(chars, {
+          duration: 0.5,
+          opacity: 0,
+          ease: 'none',
+          stagger: 0.05,
+        });
 
-      elementTimeline.play();
-    }
+        elementTimeline.play();
+      }
+    });
   });
-});
+}
+
+hoverTyping();
+
 
 /** LOADING */
 function loading() {
@@ -1929,16 +1935,16 @@ function locationHover() {
   }
 }
 
-function firstSeactionActive() {
-  document.addEventListener('DOMContentLoaded', function() {
-    let firstSection = document.querySelector('[data-trigger="hover"]');
+// function firstSeactionActive() {
+//   document.addEventListener('DOMContentLoaded', function() {
+//     let firstSection = document.querySelector('[data-trigger="hover"]');
 
-    if (firstSection) {
-      let event = new Event('mouseover');
-      firstSection.focus();
-    }
-  })
-}
+//     if (firstSection) {
+//       let event = new Event('mouseover');
+//       firstSection.focus();
+//     }
+//   })
+// }
 
 /** SEARCH */
 function searchEnter() { //so it works on refresh
