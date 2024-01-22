@@ -627,7 +627,7 @@ function hoverTyping() {
         elementTimeline.clear().seek('start'); //so it always finishes
 
         elementTimeline.from(chars, {
-          duration: 0.5,
+          duration: 0.01,
           opacity: 0,
           ease: 'none',
           stagger: 0.05,
