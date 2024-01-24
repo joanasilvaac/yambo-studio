@@ -47,18 +47,18 @@ function debounce(func, delay) {
   resizeTimeout = setTimeout(func, delay);
 }
 
-function onWindowResize() {
-  stickyReturn();
-  homepageHeroDesktop();
-  //homepageHeroMobile();
-  objectsHeroDesktop();
-  objectsHeroMobile();
-  objectsSwiper();
-}
+// function onWindowResize() {
+//   stickyReturn();
+//   homepageHeroDesktop();
+//   //homepageHeroMobile();
+//   objectsHeroDesktop();
+//   objectsHeroMobile();
+//   objectsSwiper();
+// }
 
-window.addEventListener('resize', function () {
-  debounce(onWindowResize, 1000); // 1000 milliseconds (1 second) delay
-});
+// window.addEventListener('resize', function () {
+//   debounce(onWindowResize, 1000); // 1000 milliseconds (1 second) delay
+// });
 
 
 /* register the gsap plugins */
@@ -83,12 +83,21 @@ barba.hooks.after(function(data) {
 });
 
 let scrollY = 0;
+
+const searchLottie = document.getElementById('search-icon'),
+  searchOpen = document.querySelector('.navbar__search'),
+  searchClose = document.querySelector('.search-leave-animation');
+
+searchOpen.addEventListener('click', function(){
+  searchLottie.setDirection(1);
+  searchLottie.play();
+});
   
 barba.init({
   views: [{
     namespace: 'home',
     beforeEnter() {
-      loading()
+      //loading()
       homepageHeroDesktop()
       //homepageHeroMobile()
       homepageHeroLines()
@@ -400,7 +409,8 @@ barba.init({
         namespace: ['search']
       },
       leave(data) {    
-        document.querySelector('.search-leave-animation').click();
+        searchLottie.setDirection(-1);
+        searchLottie.play();
 
         return gsap.to(data.current.container, {
           opacity: 0, 
@@ -610,7 +620,6 @@ gsap.utils.toArray(letters).forEach(function(letter, index) {
   });
 });
 
-
 /* Typing hover interaction */ 
 function hoverTyping() {
   const hoverEls = document.querySelectorAll('[data-hover="type"]');
@@ -642,92 +651,92 @@ function hoverTyping() {
 hoverTyping();
 
 
-/** LOADING */
-function loading() {
-  let loading = document.querySelector('.loading');
+// /** LOADING */
+// function loading() {
+//   let loading = document.querySelector('.loading');
 
-  if (loading && !Cookies.get('loading')) {
-    const loadingInfo = document.querySelector('.loading-info'),
-      loadingText = document.querySelector('.loading-text'),
-      splitText = new SplitText(loadingText, { type: 'words,chars' }),
-      blinkingSpan = document.querySelector('.loading .loading-span'),
-      loadingPercentage = document.querySelector('.loading-percentage');
+//   if (loading && !Cookies.get('loading')) {
+//     const loadingInfo = document.querySelector('.loading-info'),
+//       loadingText = document.querySelector('.loading-text'),
+//       splitText = new SplitText(loadingText, { type: 'words,chars' }),
+//       blinkingSpan = document.querySelector('.loading .loading-span'),
+//       loadingPercentage = document.querySelector('.loading-percentage');
 
-    let chars = splitText.chars,
-      loadingTimeline = gsap.timeline(),
-      initialPercentage = 0,
-      loadFlag;
+//     let chars = splitText.chars,
+//       loadingTimeline = gsap.timeline(),
+//       initialPercentage = 0,
+//       loadFlag;
 
-    gsap.set(loadingInfo, { opacity: 1 });
+//     gsap.set(loadingInfo, { opacity: 1 });
 
-    loadingTimeline.to(blinkingSpan, {
-      width: '1rem',
-      duration: 0.25,
-      ease: CustomEase.create('blinking-line', '.25, 0, .15, 1'),
-      transformOrigin: 'left',
-      onComplete() {
-        blinkingSpan.classList.add('blinking-span')
-      }
-    }).from(chars, {
-      duration: 0.05,
-      opacity: 0,
-      stagger: 0.1,
-      delay: 0.5,
-    }).fromTo(loadingPercentage,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        duration: 0.25,
-        ease: 'blinking-line',
-      }
-    );
+//     loadingTimeline.to(blinkingSpan, {
+//       width: '1rem',
+//       duration: 0.25,
+//       ease: CustomEase.create('blinking-line', '.25, 0, .15, 1'),
+//       transformOrigin: 'left',
+//       onComplete() {
+//         blinkingSpan.classList.add('blinking-span')
+//       }
+//     }).from(chars, {
+//       duration: 0.05,
+//       opacity: 0,
+//       stagger: 0.1,
+//       delay: 0.5,
+//     }).fromTo(loadingPercentage,
+//       { opacity: 0 },
+//       {
+//         opacity: 1,
+//         duration: 0.25,
+//         ease: 'blinking-line',
+//       }
+//     );
 
-    function updatePercentage() {
-      if (initialPercentage < 100) {
-        initialPercentage += 1;
-        loadingPercentage.textContent = Math.floor(initialPercentage) + '%'; // Use Math.floor to round down to the nearest integer
-      }
-    }
+//     function updatePercentage() {
+//       if (initialPercentage < 100) {
+//         initialPercentage += 1;
+//         loadingPercentage.textContent = Math.floor(initialPercentage) + '%'; // Use Math.floor to round down to the nearest integer
+//       }
+//     }
 
-    const percentageInterval = setInterval(updatePercentage, 100);
+//     const percentageInterval = setInterval(updatePercentage, 100);
 
-    // speed up the percentage animation when the 'load' event occurs
-    function finishLoadingAnimation() { 
-      const fastAnimationTimeline = gsap.timeline();
-      fastAnimationTimeline.to(loadingPercentage, {
-        textContent: '100%',
-        duration: 0.5, // will take 0.5s to finish the animation
-        ease: 'none',
-        onUpdate: () => {
-          currentPercentage = Math.round(gsap.getProperty(loadingPercentage, 'textContent'));
-          loadingPercentage.textContent = currentPercentage + '%';
-        },
-      }).to(loading, {
-        yPercent: -100,
-        duration: 1,
-        delay: 0.25,
-        ease: CustomEase.create('loading-out', '.85,0,.75,1'),
-      }).to(loading, {
-        display: 'none',
-      });
-    }
+//     // speed up the percentage animation when the 'load' event occurs
+//     function finishLoadingAnimation() { 
+//       const fastAnimationTimeline = gsap.timeline();
+//       fastAnimationTimeline.to(loadingPercentage, {
+//         textContent: '100%',
+//         duration: 0.5, // will take 0.5s to finish the animation
+//         ease: 'none',
+//         onUpdate: () => {
+//           currentPercentage = Math.round(gsap.getProperty(loadingPercentage, 'textContent'));
+//           loadingPercentage.textContent = currentPercentage + '%';
+//         },
+//       }).to(loading, {
+//         yPercent: -100,
+//         duration: 1,
+//         delay: 0.25,
+//         ease: CustomEase.create('loading-out', '.85,0,.75,1'),
+//       }).to(loading, {
+//         display: 'none',
+//       });
+//     }
 
-    // set a timer to wait for 3 seconds, even if the 'load' event occurs earlier
-    setTimeout(() => {
-      if (loadFlag) {
-        clearInterval(percentageInterval);
-        finishLoadingAnimation();
-        Cookies.set('loading', true);
-      }
-    }, 5000);
+//     // set a timer to wait for 3 seconds, even if the 'load' event occurs earlier
+//     setTimeout(() => {
+//       if (loadFlag) {
+//         clearInterval(percentageInterval);
+//         finishLoadingAnimation();
+//         Cookies.set('loading', true);
+//       }
+//     }, 5000);
 
-    window.addEventListener('load', () => {
-      loadFlag = true; // set the flag to true when 'load' event occurs
-    });
-  } else if (document.querySelector('.loading') && Cookies.get('loading')) {
-    document.querySelector('.loading').style.display = 'none'; 
-  }
-}
+//     window.addEventListener('load', () => {
+//       loadFlag = true; // set the flag to true when 'load' event occurs
+//     });
+//   } else if (document.querySelector('.loading') && Cookies.get('loading')) {
+//     document.querySelector('.loading').style.display = 'none'; 
+//   }
+// }
 
 /** FOR TRANSITIONS */
 function resetWebflow(data) {
@@ -2026,7 +2035,7 @@ function search() {
     // check if there are results 
     let searched = document.querySelector('.search').classList.contains('searched'), 
       projectsCount = projectResults.querySelectorAll('.search-result-col[data-visibility="visible"]').length, //quantos projetos fizeram match?
-      objcetsCount = objectsResults.querySelectorAll('.search-result-col[data-visibility="visible"]').length, //quantos objects fizeram match?
+      objectsCount = objectsResults.querySelectorAll('.search-result-col[data-visibility="visible"]').length, //quantos objects fizeram match?
       projectsText = projectResults.querySelector('.search-results__count'),
       objectsText = objectsResults.querySelector('.search-results__count');
     
@@ -2044,21 +2053,21 @@ function search() {
       }
     }
 
-    if(searched && objcetsCount>0) { //se tiver searched e existirem objects com match
+    if(searched && objectsCount>0) { //se tiver searched e existirem objects com match
       gsap.set(objectsResults, { display: 'block'} )
       gsap.to(objectsResults, { autoAlpha: 1 , duration: 0.3 }) //isto é a seção wrapper de todos os objects
       objectsResults.setAttribute('data-visibility', 'visible');
 
       matchedTimeline.play();
 
-      if (objcetsCount==1) {
+      if (objectsCount==1) {
         objectsText.innerHTML = '1 result'
       } else {
-        objectsText.innerHTML = objcetsCount + ' results'
+        objectsText.innerHTML = objectsCount + ' results'
       }
     }
 
-    if ( searched && projectsCount>0 && objcetsCount == 0) { //se estiver searched e só projetos fizerem match
+    if ( searched && projectsCount>0 && objectsCount == 0) { //se estiver searched e só projetos fizerem match
       gsap.set(objectsResults, { display: 'none'} )
       gsap.to(objectsResults, { autoAlpha: 0 , duration: 0.3 })
       objectsResults.setAttribute('data-visibility', 'hide');
@@ -2066,7 +2075,7 @@ function search() {
       matchedTimeline.play();
     }
 
-    if ( searched && objcetsCount>0 && projectsCount == 0) { //se estiver searched e só objects fizerem match
+    if ( searched && objectsCount>0 && projectsCount == 0) { //se estiver searched e só objects fizerem match
       gsap.set(projectResults, { display: 'none'} )
       gsap.to(projectResults, { autoAlpha: 0 , duration: 0.3 })
       projectResults.setAttribute('data-visibility', 'hide');
@@ -2074,7 +2083,7 @@ function search() {
       matchedTimeline.play();
     }
 
-    if(searched && projectsCount==0 && objcetsCount==0) { //se estiver search e nada fizer match
+    if(searched && projectsCount==0 && objectsCount==0) { //se estiver search e nada fizer match
       gsap.to(projectResults, { autoAlpha: 0 , duration: 0.3,
         onComplete: function() { 
           gsap.set(projectResults, { display: 'none' }); 
