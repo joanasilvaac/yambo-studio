@@ -906,53 +906,59 @@ function homepageHeroDesktop() { //add hover state to clients hero
       $('.hero__client-link').removeClass('inactive');
     });
 
-    const clients = document.querySelectorAll('.hero__client-wrapper');
+    const clients = document.querySelectorAll('.hero__client-wrapper'); //get all clients elements
   
     clients.forEach((el) => {
-      let clientName = el.querySelector('.hero__client-text');
-
-      let assetContainer = el.querySelector('.hero__client-background'), 
-        video =  assetContainer.querySelector('video'),
-        loader = el.querySelector('.hero__client-loader'),
-        isVideoLoaded = false,
-        isMouseOver = false; //so videos dont play right away when they're ready, only when hovered
-
-      video.addEventListener('loadedmetadata', function() {
-        isVideoLoaded = true;
-        checkMouseOver(); //so video plays if the user is already hovering it
-      });
-
+      let clientName = el.querySelector('.hero__client-text'),
+        assetContainer = el.querySelector('.hero__client-background'), //get the div to inject
+        loader = el.querySelector('.hero__client-loader'); //loader gif
+      
       el.addEventListener('mouseover', () => {
-        isMouseOver = true; 
-        checkMouseOver();
+        loader.style.opacity = 1; //show the loader right away
+
+        let videoSrc = el.getAttribute('data-video');
+
+        //create vimeo wrapper
+        let vimeoWrapper = document.createElement('div');
+          vimeoWrapper.classList.add('homepage__hero-video', 'vimeo-wrapper');
+
+        let videoElement = document.createElement('video');
+          videoElement.autoplay = true;
+          videoElement.loop = true;
+          videoElement.muted = true;
+          videoElement.playsInline = true;
+          videoElement.preload = 'auto';
+          videoElement.style.width = '100%';
+          videoElement.style.height = '100%';
+          videoElement.style.objectFit = 'cover';
+
+        //create the src source element inside the video element
+        let sourceElement = document.createElement('source');
+          sourceElement.src = videoSrc;
+          sourceElement.type = 'video/mp4';
+
+        videoElement.appendChild(sourceElement); //append src to video element
+        vimeoWrapper.appendChild(videoElement); //append video to wrapper
+        assetContainer.appendChild(vimeoWrapper); //inject video el into container already present on the website
+
+        videoElement.addEventListener('loadedmetadata', function() { //when the video has loaded
+          isVideoLoaded = true;
+          loader.style.opacity = 0; // hide loader
+
+          assetContainer.style.opacity = 1; //show the component
+  
+          // if (clientName.getAttribute('data-hover') === 'Light') { //change the color if intended
+          //   clientName.style.color = '#f8f8f8';
+          // }  
+        });
       });
 
       el.addEventListener('mouseout', () => {
-        isMouseOver = false;
         loader.style.opacity = 0;
-
         assetContainer.style.opacity = 0;
-        clientName.style.color = '#070707';
-
-        video.pause();
+        //clientName.style.color = '#070707';
+        assetContainer.querySelector('.homepage__hero-video').remove();
       });
-
-      function checkMouseOver() {
-        if (isMouseOver) {  
-          if (!isVideoLoaded) { //if video is not loaded
-            loader.style.opacity = 1;
-          } else {
-            loader.style.opacity = 0; //video loaded, hide loader
-    
-            if (clientName.getAttribute('data-hover') === 'Light') {
-              clientName.style.color = '#f8f8f8';
-            }
-            
-            video.play();
-            assetContainer.style.opacity = 1;
-          }
-        }
-      }
     });
   }
 }
@@ -984,10 +990,7 @@ function homepageHeroDesktop() { //add hover state to clients hero
 function projectsIndex() {
   const projectsContainer = document.querySelector('[data-index="projects"]');
   const projects = document.querySelectorAll('.project-index__link'); //get all projects inside the list
-  const allAssets = document.querySelectorAll('.project-index__assets'); //get all images/videos
   const assetContainer = document.querySelector('.project-index__asset-wrapper'); //get the wrapper for the asset
-  let isVideoPlaying = false;
-  let currentAsset;
   
   //opacity animation for the asset container
   projectsContainer.addEventListener('mouseenter', () => {
@@ -1018,61 +1021,99 @@ function projectsIndex() {
     });
   })
 
-  //animation for each project line 
-  projects.forEach((el, index) => { //em cada item da lista 
+  //animation for each project line - asset change
+  projects.forEach((el) => { //em cada item da lista 
+    const assetWrapper = document.querySelector('.project-index__assets'); //vou buscar o container do asset
+    let isVideoPlaying;
+
     el.addEventListener('mouseenter', () => { //no mouseenter
-      currentAsset = allAssets[index];
+      let projectImage = el.querySelector('input[name="project-image"]').value, //valor da imagem 
+        projectVideo = el.querySelector('input[name="project-video"]').value; //valor do video id
+      
+      if(projectVideo) { //se existir vídeo
+        let vimeoWrapper = document.createElement('div');
+          vimeoWrapper.className = 'vimeo-wrapper';
+          vimeoWrapper.style.background = 'url(' + projectImage + ') center/cover no-repeat';
 
-      let iframe = currentAsset.querySelector('iframe'),
-        iframeBackground = currentAsset.querySelector('.vimeo-wrapper');
+        let iframe = document.createElement('iframe');
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+          iframe.style.position = 'relative';
+          iframe.src = 'https://player.vimeo.com/video/' + projectVideo + '?background=1&quality=720p&autoplay=1';
+          iframe.allow = 'autoplay';
+          iframe.setAttribute('webkitallowfullscreen', '');
+          iframe.setAttribute('mozallowfullscreen', '');
+          iframe.setAttribute('allowfullscreen', '');
 
-      if (currentAsset) { //se este elemento da lista tiver asset
-        currentAsset.style.zIndex = 1;
+        //create the element
+        vimeoWrapper.appendChild(iframe);
 
-        gsap.set(currentAsset, { autoAlpha: 1 }); 
+        let projectAsset = document.createElement('div');
+          projectAsset.className = 'project-index__asset';
+          projectAsset.appendChild(vimeoWrapper);
 
-        gsap.to(currentAsset, {
+        document.querySelector('.project-index__assets').appendChild(projectAsset); //create the element inside the container
+
+        projectAsset.style.zIndex = 2;
+
+        gsap.set(projectAsset, { autoAlpha: 1 }); 
+
+        gsap.to(projectAsset, {
           scale: 1.05,  
           duration: 0.5,
           ease: CustomEase.create('asset-index', '0,0,0,1'),
         });
+  
+        let player = new Vimeo.Player(iframe);
 
-        if (iframe && iframe.dataset.videoId) {
-          iframe.src = iframe.dataset.src; 
-  
-          let player = new Vimeo.Player(iframe);
-  
-          player.on('play', function() {
-            iframeBackground.style.backgroundImage = 'none';
-            iframe.style.opacity = 1;
-            isVideoPlaying = true; 
-          });
-  
-          player.play().catch(function (error) {
-            console.error('Failed to play video:', error);
-            isVideoPlaying = false; //set this to false if play failed
-          });
-        }
+        player.on('play', function() {
+          vimeoWrapper.style.backgroundImage = 'none';
+          iframe.style.opacity = 1;
+          isVideoPlaying = true; 
+        });
+
+        player.play().catch(function (error) {
+          console.error('Failed to play video:', error);
+          isVideoPlaying = false; //set this to false if play failed
+        });
+      } else if(projectImage) { //se existir imagem 
+        let img = document.createElement('img');
+          img.src = projectImage;
+          img.className = 'project-index__asset';
+
+        document.querySelector('.project-index__assets').appendChild(img);
+
+        img.style.zIndex = 2;
+
+        gsap.set(img, { autoAlpha: 1 }); 
+
+        gsap.to(img, {
+          scale: 1.05,  
+          duration: 0.5,
+          ease: CustomEase.create('asset-index', '0,0,0,1'),
+        });
       }
     });
 
     el.addEventListener('mouseleave', () => {
-      let iframe = currentAsset.querySelector('iframe');
-
-      currentAsset.style.zIndex = 0;
+      var projectAsset = document.querySelector('.project-index__asset:first-of-type');
       
-      gsap.to(currentAsset, {
-        autoAlpha: 0,
-        scale: 1,
-        duration: 0.5,
-        ease: 'asset-index',
-      });
+      if (projectAsset) {
+        projectAsset.style.zIndex = 1;
+      
+        gsap.to(projectAsset, {
+          autoAlpha: 0,
+          scale: 1,
+          duration: 0.5,
+          ease: 'asset-index',
+          onComplete:function() {
+            projectAsset.remove();
+          },
+        });
 
-      if (iframe && iframe.dataset.videoId && isVideoPlaying) {
-        let player = new Vimeo.Player(iframe);
-        
-        player.pause();
-        isVideoPlaying = false;
+        if (isVideoPlaying) {
+          isVideoPlaying = false;
+        }
       }
     });
   });
