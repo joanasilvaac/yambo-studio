@@ -941,6 +941,8 @@ function homepageHeroDesktop() { //add hover state to clients hero
         vimeoWrapper.appendChild(videoElement); //append video to wrapper
         assetContainer.appendChild(vimeoWrapper); //inject video el into container already present on the website
 
+
+        console.log(videoElement)
         videoElement.addEventListener('loadedmetadata', function() { //when the video has loaded
           isVideoLoaded = true;
           loader.style.opacity = 0; // hide loader
@@ -1096,7 +1098,7 @@ function projectsIndex() {
     });
 
     el.addEventListener('mouseleave', () => {
-      var projectAsset = document.querySelector('.project-index__asset:first-of-type');
+      let projectAsset = document.querySelector('.project-index__asset:first-of-type');
       
       if (projectAsset) {
         projectAsset.style.zIndex = 1;
@@ -1106,8 +1108,9 @@ function projectsIndex() {
           scale: 1,
           duration: 0.5,
           ease: 'asset-index',
-          onComplete:function() {
-            projectAsset.remove();
+          onComplete: function() {
+            //not working with the varibale
+            document.querySelector('.project-index__asset:first-of-type').remove();
           },
         });
 
