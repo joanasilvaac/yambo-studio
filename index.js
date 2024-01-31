@@ -94,6 +94,7 @@ searchOpen.addEventListener('click', function(){
 });
   
 barba.init({
+  prefetchIgnore: true,
   views: [{
     namespace: 'home',
     beforeEnter() {
@@ -757,7 +758,6 @@ function isTouchDevice() {
     (navigator.msMaxTouchPoints > 0);
 }
 
-
 /** CURSOR */
 function customCursors() {
   const cursors = document.querySelector('.cursor-wrapper');
@@ -907,60 +907,52 @@ function homepageHeroDesktop() { //add hover state to clients hero
     });
 
     const clients = document.querySelectorAll('.hero__client-wrapper'); //get all clients elements
-  
+
     clients.forEach((el) => {
-      let clientName = el.querySelector('.hero__client-text'),
-        assetContainer = el.querySelector('.hero__client-background'), //get the div to inject
-        loader = el.querySelector('.hero__client-loader'); //loader gif
-      
+      let clientName = el.querySelector('.hero__client-text');
+
+      let assetContainer = el.querySelector('.hero__client-background'), 
+        video =  assetContainer.querySelector('video'),
+        loader = el.querySelector('.hero__client-loader'),
+        isVideoLoaded = false,
+        isMouseOver = false; //so videos dont play right away when they're ready, only when hovered
+
+      video.addEventListener('loadedmetadata', function() {
+        isVideoLoaded = true;
+        checkMouseOver(); //so video plays if the user is already hovering it
+      });
+
       el.addEventListener('mouseover', () => {
-        loader.style.opacity = 1; //show the loader right away
-
-        let videoSrc = el.getAttribute('data-video');
-
-        //create vimeo wrapper
-        let vimeoWrapper = document.createElement('div');
-          vimeoWrapper.classList.add('homepage__hero-video', 'vimeo-wrapper');
-
-        let videoElement = document.createElement('video');
-          videoElement.autoplay = true;
-          videoElement.loop = true;
-          videoElement.muted = true;
-          videoElement.playsInline = true;
-          videoElement.preload = 'auto';
-          videoElement.style.width = '100%';
-          videoElement.style.height = '100%';
-          videoElement.style.objectFit = 'cover';
-
-        //create the src source element inside the video element
-        let sourceElement = document.createElement('source');
-          sourceElement.src = videoSrc;
-          sourceElement.type = 'video/mp4';
-
-        videoElement.appendChild(sourceElement); //append src to video element
-        vimeoWrapper.appendChild(videoElement); //append video to wrapper
-        assetContainer.appendChild(vimeoWrapper); //inject video el into container already present on the website
-
-
-        console.log(videoElement)
-        videoElement.addEventListener('loadedmetadata', function() { //when the video has loaded
-          isVideoLoaded = true;
-          loader.style.opacity = 0; // hide loader
-
-          assetContainer.style.opacity = 1; //show the component
-  
-          // if (clientName.getAttribute('data-hover') === 'Light') { //change the color if intended
-          //   clientName.style.color = '#f8f8f8';
-          // }  
-        });
+        isMouseOver = true; 
+        checkMouseOver();
       });
-
+      
       el.addEventListener('mouseout', () => {
+        isMouseOver = false;
         loader.style.opacity = 0;
+
         assetContainer.style.opacity = 0;
-        //clientName.style.color = '#070707';
-        assetContainer.querySelector('.homepage__hero-video').remove();
+        clientName.style.color = '#070707';
+
+        video.pause();
       });
+
+      function checkMouseOver() {
+        if (isMouseOver) {  
+          if (!isVideoLoaded) { //if video is not loaded
+            loader.style.opacity = 1;
+          } else {
+            loader.style.opacity = 0; //video loaded, hide loader
+
+            if (clientName.getAttribute('data-hover') === 'Light') {
+              clientName.style.color = '#f8f8f8';
+            }
+
+            video.play();
+            assetContainer.style.opacity = 1;
+          }
+        }
+      }
     });
   }
 }
@@ -1027,6 +1019,11 @@ function projectsIndex() {
   projects.forEach((el) => { //em cada item da lista 
     const assetWrapper = document.querySelector('.project-index__assets'); //vou buscar o container do asset
     let isVideoPlaying;
+    let singleUrl = el.getAttribute('href');
+
+    el.addEventListener('click', () => {
+      barba.prefetch(singleUrl);
+    });
 
     el.addEventListener('mouseenter', () => { //no mouseenter
       let projectImage = el.querySelector('input[name="project-image"]').value, //valor da imagem 
