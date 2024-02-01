@@ -65,6 +65,10 @@ function debounce(func, delay) {
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(SplitText);
 gsap.registerPlugin(CustomEase);
+
+CustomEase.create('asset-index', '0,0,0,1');
+CustomEase.create('blinking-line', '.25, 0, .15, 1');
+CustomEase.create('splitLines', '.4, 0, 0, 1');
   
 const cleanGSAP = () => {
 	ScrollTrigger.getAll().forEach(t => t.kill(false));
@@ -95,10 +99,11 @@ searchOpen.addEventListener('click', function(){
   
 barba.init({
   prefetchIgnore: true,
+  preventRunning: true,
+  cacheIgnore: true,
   views: [{
     namespace: 'home',
     beforeEnter() {
-      //loading()
       homepageHeroDesktop()
       //homepageHeroMobile()
       homepageHeroLines()
@@ -123,7 +128,7 @@ barba.init({
       iframePoster()
       aboutIndexes()
       locationHover()
-      //firstSeactionActive()
+      aboutSectionsHover() //only for the 2 cols
     }, 
     afterEnter() {
       aboutVideo()
@@ -160,8 +165,6 @@ barba.init({
   }],
   transitions: [
   {
-    preventRunning: true, //don't run animations on top of each other
-    cacheIgnore: true,
     name: 'default-transition',
     leave(data) {
       return gsap.to(data.current.container, {
@@ -199,7 +202,6 @@ barba.init({
     }
   },
   {
-    preventRunning: true, //don't run animations on top of each other
     name: 'project-enter',
     from: { 
       namespace: ['home']
@@ -243,7 +245,6 @@ barba.init({
     }
   },
   {
-    preventRunning: true, //don't run animations on top of each other
     name: 'project-leave',
     from: { 
       namespace: ['projects']
@@ -281,52 +282,50 @@ barba.init({
     }
   }, 
 	{
-    preventRunning: true, //don't run animations on top of each other
-      name: 'objects-enter',
-      from: { 
-        namespace: ['objects']
-      },
-      to: { 
-        namespace: ['objects-single']
-      },
-      leave(data) {
-        scrollY = barba.history.current.scroll.y;
-      
-        return gsap.to(data.current.container, {
-          opacity: 0
-        });
-      },
-      enter(data) {
-        gsap.defaults({
-          ease: 'power2.inOut',
-          duration: 1,
-        });  
+    name: 'objects-enter',
+    from: { 
+      namespace: ['objects']
+    },
+    to: { 
+      namespace: ['objects-single']
+    },
+    leave(data) {
+      scrollY = barba.history.current.scroll.y;
     
-        data.next.container.classList.add('fixed');
-        
-        hideScrollbar(); //hide scrollbar
-        
-        //reveal page 
-        return gsap.fromTo(
-          data.next.container,
-          { opacity: 0 }, 
-          {	
-            opacity: 1, 
-            onStart: () => {
-              window.scrollTo({
-                top: 0,
-                left: 0,
-              });
-            },
-            onComplete: () => {
-              data.next.container.classList.remove('fixed');
-            }
+      return gsap.to(data.current.container, {
+        opacity: 0
+      });
+    },
+    enter(data) {
+      gsap.defaults({
+        ease: 'power2.inOut',
+        duration: 1,
+      });  
+  
+      data.next.container.classList.add('fixed');
+      
+      hideScrollbar(); //hide scrollbar
+      
+      //reveal page 
+      return gsap.fromTo(
+        data.next.container,
+        { opacity: 0 }, 
+        {	
+          opacity: 1, 
+          onStart: () => {
+            window.scrollTo({
+              top: 0,
+              left: 0,
+            });
+          },
+          onComplete: () => {
+            data.next.container.classList.remove('fixed');
           }
-        );
-      }
+        }
+      );
+    }
     },
     {
-      preventRunning: true, //don't run animations on top of each other
       name: 'objects-leave',
       from: { 
         namespace: ['objects-single']
@@ -364,7 +363,6 @@ barba.init({
       }
     }, 
     {
-      preventRunning: true, //don't run animations on top of each other
       name: 'search-enter',
       to: { 
         namespace: ['search']
@@ -404,7 +402,6 @@ barba.init({
       }
     },
     {
-      preventRunning: true, //don't run animations on top of each other
       name: 'search-leave',
       from: { 
         namespace: ['search']
@@ -460,21 +457,6 @@ const remToPixels = (rem) => rem * 16;
 
 /* Smooth scroll */
 const lenis = new Lenis();
-
-// function raf(time) {
-//   lenis.raf(time)
-//   requestAnimationFrame(raf)
-// }
-
-// lenis.on('scroll', ScrollTrigger.update);
-
-// requestAnimationFrame(raf);
-
-
-// const lenis = new Lenis({
-//   smoothWheel: true,
-//   duration: 1.2 
-// });
 
 lenis.on('scroll', ScrollTrigger.update);
 
@@ -887,7 +869,7 @@ function homepageHeroLines() {
         duration: 0.6,
         opacity: 0,
         stagger: 0.1,
-        ease: 'power4',
+        ease: 'splitLines',
         onComplete() {
           gsap.set(splitLines.lines, { clearProps: 'all' });
           //gsap.set(background, { visibility: 'visible' });
@@ -1060,7 +1042,7 @@ function projectsIndex() {
         gsap.to(projectAsset, {
           scale: 1.05,  
           duration: 0.5,
-          ease: CustomEase.create('asset-index', '0,0,0,1'),
+          ease: 'asset-index',
         });
   
         let player = new Vimeo.Player(iframe);
@@ -1089,7 +1071,7 @@ function projectsIndex() {
         gsap.to(img, {
           scale: 1.05,  
           duration: 0.5,
-          ease: CustomEase.create('asset-index', '0,0,0,1'),
+          ease: 'asset-index',
         });
       }
     });
@@ -1477,7 +1459,7 @@ function projectSrollAnimations() {
           duration: 1,
           opacity: 0,
           stagger: 0.1,
-          ease: "power4",
+          ease: 'power4',
         });
 
         if (blockLink) { // check if blockLink exists and add its animation to the timeline
@@ -1486,7 +1468,7 @@ function projectSrollAnimations() {
           timeline.to(blockLink, {
             opacity: 0.5,
             duration: 0.6,
-            ease: "power4",
+            ease: 'power4',
           });
         }
       });
@@ -1511,14 +1493,16 @@ function objectsHeroLines() {
         opacity: 0,
         duration: 0.5,
         stagger: 0.08,
-        ease: [.4, 0, 0, 1],
+        ease: 'splitLines',
         onComplete() {
-          gsap.set(splitLines.lines, { clearProps: 'all' });
-          objectsHeroText.style.color = '#dedede';
-          objectsHeroText.style.mixBlendMode = 'difference';
-
-          document.querySelectorAll('.objects-index__text--areas').forEach(function(el) {
-            el.classList.add('obj-areas-underline');
+          const finsih = gsap.timeline();
+      
+          finsih.to(splitLines.lines, { clearProps: 'all' })
+          .to(objectsHeroText.style, { color: '#dedede', mixBlendMode: 'difference' }, 0) // synchronize color and mixBlendMode
+          .call(() => {
+            document.querySelectorAll('.objects-index__text--areas').forEach(function(el) {
+              el.classList.add('obj-areas-underline');
+            });
           });
         }
       });
@@ -1985,16 +1969,19 @@ function locationHover() {
   }
 }
 
-// function firstSeactionActive() {
-//   document.addEventListener('DOMContentLoaded', function() {
-//     let firstSection = document.querySelector('[data-trigger="hover"]');
+function aboutSectionsHover() { //only for the 2 cols
+  let sections = document.querySelectorAll('.about-two-col');
 
-//     if (firstSection) {
-//       let event = new Event('mouseover');
-//       firstSection.focus();
-//     }
-//   })
-// }
+  sections.forEach(function(el) {
+    el.addEventListener('mouseover', () => {
+      el.classList.add('active')
+    });
+
+    el.addEventListener('mouseleave', () => {
+      el.classList.remove('active')
+    });
+  })
+}
 
 /** SEARCH */
 function searchEnter() { //so it works on refresh
