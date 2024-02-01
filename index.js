@@ -1332,18 +1332,18 @@ function projectsNavigation() {
     let allProjects = $(data).find('.homepage__projects');
     let currentProject = allProjects.find('[href$="' + currentSlug + '"]').closest('.projects-index'),
       prevProject = allProjects.find('.projects-index').eq(currentProject.index() - 1),
-      prevAssets = allProjects.find('.project-index__assets').eq(currentProject.index() - 1),
+      prevAssets = allProjects.find('.project-index__data').eq(currentProject.index() - 1),
       nextProject = allProjects.find('.projects-index').eq(currentProject.index() + 1),
-      nextAssets = allProjects.find('.project-index__assets').eq(currentProject.index() + 1);
+      nextAssets = allProjects.find('.project-index__data').eq(currentProject.index() + 1);
 
     let prevTitle = prevProject.find('.project-info__title p:last-of-type').text(),
       prevYear = prevProject.find('.project-info__year').text(), 
-      prevImage = prevAssets.find('img').attr('src'),
+      prevImage = prevAssets.find('input[name="project-image"]').val(),
       prevUrl = prevProject.find('.project-index__link').attr('href');
 
     let nextTitle = nextProject.find('.project-info__title p:last-of-type').text(),
       nextYear = nextProject.find('.project-info__year').text(), 
-      nextImage = nextAssets.find('img').attr('src'),
+      nextImage = nextAssets.find('input[name="project-image"]').val(),
       nextUrl = nextProject.find('.project-index__link').attr('href');
 
     document.querySelector('.proj-others__wrapper[data-proj-others="prev"]').href = prevUrl;
