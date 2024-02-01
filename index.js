@@ -1624,6 +1624,12 @@ function objectsIndex() {
   })
 
   objects.forEach((el, index) => { //em cada item da lista 
+    let singleUrl = el.getAttribute('href');
+
+    el.addEventListener('click', () => {
+      barba.prefetch(singleUrl);
+    });
+
     el.addEventListener('mouseenter', () => { //no mouseenter
       currentAsset = allAssets[index];
       
