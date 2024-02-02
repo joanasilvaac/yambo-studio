@@ -899,10 +899,15 @@ function homepageHeroDesktop() { //add hover state to clients hero
         isVideoLoaded = false,
         isMouseOver = false; //so videos dont play right away when they're ready, only when hovered
 
-      video.addEventListener('loadedmetadata', function() {
+      if (video.readyState >= 2) { //the video was loaded already
         isVideoLoaded = true;
-        checkMouseOver(); //so video plays if the user is already hovering it
-      });
+        checkMouseOver();
+      } else {
+        video.addEventListener('canplay', function() { //the video is loaded for the 1st time 
+          isVideoLoaded = true;
+          checkMouseOver();
+        });
+      }
 
       el.addEventListener('mouseover', () => {
         isMouseOver = true; 
