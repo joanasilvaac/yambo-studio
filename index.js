@@ -37,7 +37,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-  
+
+
+/* hide cursor when exiting the window */
+$(window).on('mouseenter', function(){
+  $('.cursor-wrapper').css('opacity', '1');
+});
+
+$(window).on('mouseout', function(){
+  $('.cursor-wrapper').css('opacity', '0');
+});
+
 
 /* reload automatically */
 let resizeTimeout;
@@ -239,6 +249,7 @@ barba.init({
           },
           onComplete: () => {
             data.next.container.classList.remove('fixed');
+            document.querySelector('.project-hero').style.opacity = '1';
           }
         }
       );
@@ -669,7 +680,7 @@ hoverTyping();
 //       { opacity: 0 },
 //       {
 //         opacity: 1,
-//         duration: 0.25,
+//         duration: 0.25,&
 //         ease: 'blinking-line',
 //       }
 //     );
@@ -858,6 +869,8 @@ function homepageHeroLines() {
     homepageHeroText.forEach((el) => {
       // const background = el.querySelector('.hero__client-background');
       // gsap.set(background, { visibility: 'hidden' });
+
+      gsap.set(homepageHeroText, { opacity: 1} )
 
       const splitLines = new SplitText(el, {
         type: 'lines',
@@ -1776,17 +1789,17 @@ function objectsEnquire() {
 
   gsap.set(document.querySelector('.enquire-close'), { opacity: 0, y: 5 });
   
-  document.querySelectorAll('.objects-index__link-wrapper').forEach(function(link) {
-    link.addEventListener('mouseover', () => {
-      link.querySelector('.enquire-button').style.opacity = '1';
-      link.querySelector('.objects-index__link').style.opacity = '1';
-    });
+  // document.querySelectorAll('.objects-index__link-wrapper').forEach(function(link) {
+  //   link.addEventListener('mouseover', () => {
+  //     link.querySelector('.enquire-button').style.opacity = '1';
+  //     link.querySelector('.objects-index__link').style.opacity = '1';
+  //   });
     
-    link.addEventListener('mouseout', () => {
-      link.querySelector('.enquire-button').style.opacity = '0.5';
-      link.querySelector('.objects-index__link').style.opacity = '0.5';
-    });
-  });
+  //   link.addEventListener('mouseout', () => {
+  //     link.querySelector('.enquire-button').style.opacity = '0.5';
+  //     link.querySelector('.objects-index__link').style.opacity = '0.5';
+  //   });
+  // });
 
   document.querySelectorAll('.enquire-button').forEach(function(button) {
     if(button.textContent!='--') {
