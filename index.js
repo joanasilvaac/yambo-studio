@@ -115,7 +115,7 @@ barba.init({
     namespace: 'home',
     beforeEnter() {
       homepageHeroDesktop()
-      //homepageHeroMobile()
+      //homepageHeror()
       homepageHeroLines()
       projectsIndex()
     }
@@ -129,6 +129,7 @@ barba.init({
       videoComponent()
     }, 
     afterEnter() {
+      //showProjectHero()
       projectsNavigation()
       projectSrollAnimations()
     }
@@ -478,141 +479,143 @@ gsap.ticker.add((time) => {
 gsap.ticker.lagSmoothing(0);
 
 /* logo interaction */
-let text = new SplitText('.navbar__logo', { type: "chars" }),
-  letters = text.chars;
+if (!isTouchDevice()) {
+  let text = new SplitText('.navbar__logo', { type: "chars" }),
+    letters = text.chars;
 
-gsap.utils.toArray(letters).forEach(function(letter, index) {
-  letter.addEventListener('mouseenter', () =>{
-    gsap.to(letter, {
-      y: -3,
-      x: 2,
-      duration: 0.2,
-      onStart: function() {
-        letter.classList.add('active');
-      },
-    })
-
-    //animate the previous letter if it exists
-    if (index > 0) {
-      const prevLetter = letters[index - 1];
-
-      gsap.to(prevLetter, {
-        y: -2,
-        x: 1,
+  gsap.utils.toArray(letters).forEach(function(letter, index) {
+    letter.addEventListener('mouseenter', () =>{
+      gsap.to(letter, {
+        y: -3,
+        x: 2,
         duration: 0.2,
         onStart: function() {
-          prevLetter.classList.add('active');
+          letter.classList.add('active');
         },
-      });
+      })
 
-      //animate the 2nd previous letter if it exists
-      if (index > 1) {
-        const prevLetter2 = letters[index - 2];
-        gsap.to(prevLetter2, {
-          y: -1,
-          x: 0,
+      //animate the previous letter if it exists
+      if (index > 0) {
+        const prevLetter = letters[index - 1];
+
+        gsap.to(prevLetter, {
+          y: -2,
+          x: 1,
           duration: 0.2,
           onStart: function() {
-            prevLetter2.classList.add('active');
+            prevLetter.classList.add('active');
           },
         });
+
+        //animate the 2nd previous letter if it exists
+        if (index > 1) {
+          const prevLetter2 = letters[index - 2];
+          gsap.to(prevLetter2, {
+            y: -1,
+            x: 0,
+            duration: 0.2,
+            onStart: function() {
+              prevLetter2.classList.add('active');
+            },
+          });
+        }
       }
-    }
 
-    //animate the next letter if it exists
-    if (index < letters.length - 1) {
-      const nextLetter = letters[index + 1];
-    
-      gsap.to(nextLetter, {
-        y: -2,
-        x: 1,
-        duration: 0.2,
-        onStart: function() {
-          nextLetter.classList.add('active');
-        },
-      });
-
-      //animate the 2nd next letter if it exists
-      if (index < letters.length - 2) {
-        const nextLetter2 = letters[index + 2];
-        gsap.to(nextLetter2, {
-          y: -1,
-          x: 0,
+      //animate the next letter if it exists
+      if (index < letters.length - 1) {
+        const nextLetter = letters[index + 1];
+      
+        gsap.to(nextLetter, {
+          y: -2,
+          x: 1,
           duration: 0.2,
           onStart: function() {
-            nextLetter2.classList.add('active');
+            nextLetter.classList.add('active');
           },
         });
-      }
-    }
-  });
 
-  letter.addEventListener('mouseleave',  () =>{
-    //reset animation for the current letter
-    gsap.to(letter, {
-      y: 0,
-      x: 0,
-      duration: 0.2,
-      onStart: function() {
-        letter.classList.remove('active');
-      },
+        //animate the 2nd next letter if it exists
+        if (index < letters.length - 2) {
+          const nextLetter2 = letters[index + 2];
+          gsap.to(nextLetter2, {
+            y: -1,
+            x: 0,
+            duration: 0.2,
+            onStart: function() {
+              nextLetter2.classList.add('active');
+            },
+          });
+        }
+      }
     });
 
-    //reset animation for the previous letter if it exists
-    if (index > 0) {
-      const prevLetter = letters[index - 1];
-    
-      gsap.to(prevLetter, {
+    letter.addEventListener('mouseleave',  () =>{
+      //reset animation for the current letter
+      gsap.to(letter, {
         y: 0,
         x: 0,
         duration: 0.2,
         onStart: function() {
-          prevLetter.classList.remove('active');
+          letter.classList.remove('active');
         },
       });
 
-      //reset animation for the 2nd previous letter if it exists
-      if (index > 1) {
-        const prevLetter2 = letters[index - 2];
-        gsap.to(prevLetter2, {
-          y: 0,
-          x: 0,
-          duration: 0.2,
-          onStart: function() {
-            prevLetter2.classList.remove('active');
-          },
-        });
-      }
-    }
-
-    //reset animation for the next letter if it exists
-    if (index < letters.length - 1) {
-      const nextLetter = letters[index + 1];
+      //reset animation for the previous letter if it exists
+      if (index > 0) {
+        const prevLetter = letters[index - 1];
       
-      gsap.to(nextLetter, {
-        y: 0,
-        x: 0,
-        duration: 0.2,
-        onStart: function() {
-          nextLetter.classList.remove('active');
-        },
-      });
-
-      //reset animation for the 2nd next letter if it exists
-      if (index < letters.length - 2) {
-        const nextLetter2 = letters[index + 2];
-        gsap.to(nextLetter2, {
+        gsap.to(prevLetter, {
           y: 0,
           x: 0,
           duration: 0.2,
           onStart: function() {
-            nextLetter2.classList.remove('active');
+            prevLetter.classList.remove('active');
           },
         });
+
+        //reset animation for the 2nd previous letter if it exists
+        if (index > 1) {
+          const prevLetter2 = letters[index - 2];
+          gsap.to(prevLetter2, {
+            y: 0,
+            x: 0,
+            duration: 0.2,
+            onStart: function() {
+              prevLetter2.classList.remove('active');
+            },
+          });
+        }
       }
-    }
+
+      //reset animation for the next letter if it exists
+      if (index < letters.length - 1) {
+        const nextLetter = letters[index + 1];
+        
+        gsap.to(nextLetter, {
+          y: 0,
+          x: 0,
+          duration: 0.2,
+          onStart: function() {
+            nextLetter.classList.remove('active');
+          },
+        });
+
+        //reset animation for the 2nd next letter if it exists
+        if (index < letters.length - 2) {
+          const nextLetter2 = letters[index + 2];
+          gsap.to(nextLetter2, {
+            y: 0,
+            x: 0,
+            duration: 0.2,
+            onStart: function() {
+              nextLetter2.classList.remove('active');
+            },
+          });
+        }
+      }
+    });
   });
-});
+}
 
 /* Typing hover interaction */ 
 function hoverTyping() {
@@ -644,93 +647,6 @@ function hoverTyping() {
 
 hoverTyping();
 
-
-// /** LOADING */
-// function loading() {
-//   let loading = document.querySelector('.loading');
-
-//   if (loading && !Cookies.get('loading')) {
-//     const loadingInfo = document.querySelector('.loading-info'),
-//       loadingText = document.querySelector('.loading-text'),
-//       splitText = new SplitText(loadingText, { type: 'words,chars' }),
-//       blinkingSpan = document.querySelector('.loading .loading-span'),
-//       loadingPercentage = document.querySelector('.loading-percentage');
-
-//     let chars = splitText.chars,
-//       loadingTimeline = gsap.timeline(),
-//       initialPercentage = 0,
-//       loadFlag;
-
-//     gsap.set(loadingInfo, { opacity: 1 });
-
-//     loadingTimeline.to(blinkingSpan, {
-//       width: '1rem',
-//       duration: 0.25,
-//       ease: CustomEase.create('blinking-line', '.25, 0, .15, 1'),
-//       transformOrigin: 'left',
-//       onComplete() {
-//         blinkingSpan.classList.add('blinking-span')
-//       }
-//     }).from(chars, {
-//       duration: 0.05,
-//       opacity: 0,
-//       stagger: 0.1,
-//       delay: 0.5,
-//     }).fromTo(loadingPercentage,
-//       { opacity: 0 },
-//       {
-//         opacity: 1,
-//         duration: 0.25,&
-//         ease: 'blinking-line',
-//       }
-//     );
-
-//     function updatePercentage() {
-//       if (initialPercentage < 100) {
-//         initialPercentage += 1;
-//         loadingPercentage.textContent = Math.floor(initialPercentage) + '%'; // Use Math.floor to round down to the nearest integer
-//       }
-//     }
-
-//     const percentageInterval = setInterval(updatePercentage, 100);
-
-//     // speed up the percentage animation when the 'load' event occurs
-//     function finishLoadingAnimation() { 
-//       const fastAnimationTimeline = gsap.timeline();
-//       fastAnimationTimeline.to(loadingPercentage, {
-//         textContent: '100%',
-//         duration: 0.5, // will take 0.5s to finish the animation
-//         ease: 'none',
-//         onUpdate: () => {
-//           currentPercentage = Math.round(gsap.getProperty(loadingPercentage, 'textContent'));
-//           loadingPercentage.textContent = currentPercentage + '%';
-//         },
-//       }).to(loading, {
-//         yPercent: -100,
-//         duration: 1,
-//         delay: 0.25,
-//         ease: CustomEase.create('loading-out', '.85,0,.75,1'),
-//       }).to(loading, {
-//         display: 'none',
-//       });
-//     }
-
-//     // set a timer to wait for 3 seconds, even if the 'load' event occurs earlier
-//     setTimeout(() => {
-//       if (loadFlag) {
-//         clearInterval(percentageInterval);
-//         finishLoadingAnimation();
-//         Cookies.set('loading', true);
-//       }
-//     }, 5000);
-
-//     window.addEventListener('load', () => {
-//       loadFlag = true; // set the flag to true when 'load' event occurs
-//     });
-//   } else if (document.querySelector('.loading') && Cookies.get('loading')) {
-//     document.querySelector('.loading').style.display = 'none'; 
-//   }
-// }
 
 /** FOR TRANSITIONS */
 function resetWebflow(data) {
@@ -863,31 +779,37 @@ function showScrollbar() {
   
 /** HOMEPAGE */
 function homepageHeroLines() {
+  const homepageHeroText = document.querySelector('.hero__clients-collection');
+
   if (window.matchMedia('(min-width: 992px)').matches) {
-    const homepageHeroText = gsap.utils.toArray('.hero__clients-collection');
+    gsap.set(homepageHeroText, { opacity: 1} )
 
-    homepageHeroText.forEach((el) => {
-      // const background = el.querySelector('.hero__client-background');
-      // gsap.set(background, { visibility: 'hidden' });
+    const splitLines = new SplitText(homepageHeroText, {
+      type: 'lines',
+      linesClass: 'line line++'
+    });
 
-      gsap.set(homepageHeroText, { opacity: 1} )
+    gsap.from(splitLines.lines, {
+      yPercent: 100,
+      duration: 0.6,
+      opacity: 0,
+      stagger: 0.1,
+      ease: 'splitLines',
+      onComplete() {
+        gsap.set(splitLines.lines, { clearProps: 'all' });
+      }
+    });
+  } else {
+    gsap.set(homepageHeroText, { opacity: 1} )
 
-      const splitLines = new SplitText(el, {
-        type: 'lines',
-        linesClass: 'line line++'
-      });
+    const lines = homepageHeroText.querySelectorAll('.hero__client-wrapper');
 
-      gsap.from(splitLines.lines, {
-        yPercent: 100,
-        duration: 0.6,
-        opacity: 0,
-        stagger: 0.1,
-        ease: 'splitLines',
-        onComplete() {
-          gsap.set(splitLines.lines, { clearProps: 'all' });
-          //gsap.set(background, { visibility: 'visible' });
-        }
-      });
+    gsap.from(lines, {
+      yPercent: 100,
+      duration: 0.6,
+      opacity: 0,
+      stagger: 0.05,
+      ease: 'splitLines',
     });
   }
 }
