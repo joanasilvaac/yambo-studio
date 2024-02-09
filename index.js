@@ -99,7 +99,10 @@ barba.hooks.beforeEnter(function() { //only things that are common to all pages
    
 barba.hooks.after(function(data) {
   resetWebflow(data);
-  hoverTyping();
+
+  if (!isTouchDevice()) {
+    hoverTyping();
+  }
 });
 
 let scrollY = 0;
@@ -135,7 +138,7 @@ barba.init({
       videoComponent()
     }, 
     afterEnter() {
-      //showProjectHero()
+      document.querySelector('.project-hero').style.opacity = '1';
       projectsNavigation()
       projectSrollAnimations()
     }
@@ -256,7 +259,6 @@ barba.init({
           },
           onComplete: () => {
             data.next.container.classList.remove('fixed');
-            document.querySelector('.project-hero').style.opacity = '1';
           }
         }
       );
@@ -662,9 +664,6 @@ function hoverTyping() {
     });
   });
 }
-
-hoverTyping();
-
 
 /** FOR TRANSITIONS */
 function resetWebflow(data) {
@@ -1373,7 +1372,7 @@ function projectSrollAnimations() {
               ease: 'power4',
               scrollTrigger: {
                 trigger: el,
-                start: 'top-=40 bottom-=200',
+                start: 'top-=40 bottom-=100',
                 end: 'bottom bottom',
                 //markers: true,
               },
@@ -1398,9 +1397,10 @@ function projectSrollAnimations() {
         const blockLink = el.querySelector('.proj-text-block__link');
 
         const timeline = gsap.timeline({
+    
           scrollTrigger: {
             trigger: el,
-            start: "top center+=200",
+            start: 'top-=40 bottom-=200',
             end: "bottom bottom",
             //markers: true,
           },
