@@ -1,3 +1,9 @@
+function isTouchDevice() {
+  return ('ontouchstart' in window) ||
+    (navigator.maxTouchPoints > 0) ||
+    (navigator.msMaxTouchPoints > 0);
+}
+
 /* disable scroll */
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.menu-toggle').forEach(trigger => {
@@ -478,8 +484,24 @@ gsap.ticker.add((time) => {
 
 gsap.ticker.lagSmoothing(0);
 
+
+
+if (isTouchDevice()) {
+  console.log('it is')
+
+  let blinkingBars = document.querySelectorAll('.blinking-span');
+
+  console.log(blinkingBars)
+
+  blinkingBars.forEach(function(el) {
+    el.remove();
+  })
+}
+
+
 /* logo interaction */
 if (!isTouchDevice()) {
+  console.log('its not')
   let text = new SplitText('.navbar__logo', { type: "chars" }),
     letters = text.chars;
 
@@ -661,12 +683,6 @@ function resetWebflow(data) {
   }
 }
 
-function isTouchDevice() {
-  return ('ontouchstart' in window) ||
-    (navigator.maxTouchPoints > 0) ||
-    (navigator.msMaxTouchPoints > 0);
-}
-
 /** CURSOR */
 function customCursors() {
   const cursors = document.querySelector('.cursor-wrapper');
@@ -829,20 +845,26 @@ function homepageHeroDesktop() { //add hover state to clients hero
       let clientName = el.querySelector('.hero__client-text');
 
       let assetContainer = el.querySelector('.hero__client-background'), 
-        video =  assetContainer.querySelector('video'),
+        //video =  assetContainer.querySelector('video'),
+        video =  assetContainer.querySelector('iframe'),
         loader = el.querySelector('.hero__client-loader'),
         isVideoLoaded = false,
         isMouseOver = false; //so videos dont play right away when they're ready, only when hovered
 
-      if (video.readyState >= 2) { //the video was loaded already
-        isVideoLoaded = true;
-        checkMouseOver();
-      } else {
-        video.addEventListener('canplay', function() { //the video is loaded for the 1st time 
+      // if (video.readyState >= 2) { //the video was loaded already
+      //   isVideoLoaded = true;
+      //   checkMouseOver();
+      // } else {
+        video.onload = function (){
           isVideoLoaded = true;
           checkMouseOver();
-        });
-      }
+        }
+  
+        // video.addEventListener('canplay', function() { //the video is loaded for the 1st time 
+        //   isVideoLoaded = true;
+        //   checkMouseOver();
+        // });
+      //}
 
       el.addEventListener('mouseover', () => {
         isMouseOver = true; 
@@ -856,7 +878,8 @@ function homepageHeroDesktop() { //add hover state to clients hero
         assetContainer.style.opacity = 0;
         clientName.style.color = '#070707';
 
-        video.pause();
+        //video.pause();
+        video.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
       });
 
       function checkMouseOver() {
@@ -870,7 +893,8 @@ function homepageHeroDesktop() { //add hover state to clients hero
               clientName.style.color = '#f8f8f8';
             }
 
-            video.play();
+            //video.play();
+            video.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
             assetContainer.style.opacity = 1;
           }
         }
