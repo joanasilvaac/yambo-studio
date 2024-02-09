@@ -484,24 +484,8 @@ gsap.ticker.add((time) => {
 
 gsap.ticker.lagSmoothing(0);
 
-
-
-if (isTouchDevice()) {
-  console.log('it is')
-
-  let blinkingBars = document.querySelectorAll('.blinking-span');
-
-  console.log(blinkingBars)
-
-  blinkingBars.forEach(function(el) {
-    el.remove();
-  })
-}
-
-
 /* logo interaction */
 if (!isTouchDevice()) {
-  console.log('its not')
   let text = new SplitText('.navbar__logo', { type: "chars" }),
     letters = text.chars;
 
@@ -637,6 +621,18 @@ if (!isTouchDevice()) {
       }
     });
   });
+}
+
+/* Remove blinking spans from touch devices */
+if (isTouchDevice()) {
+  let blinkingSpans = document.querySelectorAll('.blinking-span'),
+    nestedBlinking = document.querySelectorAll('.nested-blinking-span');
+
+  let allBlinks = [...blinkingSpans].concat([...nestedBlinking]);
+
+  allBlinks.forEach(function(el) {
+    el.remove();
+  })
 }
 
 /* Typing hover interaction */ 
@@ -845,26 +841,20 @@ function homepageHeroDesktop() { //add hover state to clients hero
       let clientName = el.querySelector('.hero__client-text');
 
       let assetContainer = el.querySelector('.hero__client-background'), 
-        //video =  assetContainer.querySelector('video'),
-        video =  assetContainer.querySelector('iframe'),
+        video =  assetContainer.querySelector('video'),
         loader = el.querySelector('.hero__client-loader'),
         isVideoLoaded = false,
         isMouseOver = false; //so videos dont play right away when they're ready, only when hovered
 
-      // if (video.readyState >= 2) { //the video was loaded already
-      //   isVideoLoaded = true;
-      //   checkMouseOver();
-      // } else {
-        video.onload = function (){
+      if (video.readyState >= 2) { //the video was loaded already
+        isVideoLoaded = true;
+        checkMouseOver();
+      } else {
+        video.addEventListener('canplay', function() { //the video is loaded for the 1st time 
           isVideoLoaded = true;
           checkMouseOver();
-        }
-  
-        // video.addEventListener('canplay', function() { //the video is loaded for the 1st time 
-        //   isVideoLoaded = true;
-        //   checkMouseOver();
-        // });
-      //}
+        });
+      }
 
       el.addEventListener('mouseover', () => {
         isMouseOver = true; 
@@ -878,8 +868,7 @@ function homepageHeroDesktop() { //add hover state to clients hero
         assetContainer.style.opacity = 0;
         clientName.style.color = '#070707';
 
-        //video.pause();
-        video.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        video.pause();
       });
 
       function checkMouseOver() {
@@ -889,12 +878,11 @@ function homepageHeroDesktop() { //add hover state to clients hero
           } else {
             loader.style.opacity = 0; //video loaded, hide loader
 
-            if (clientName.getAttribute('data-hover') === 'Light') {
+            if (clientName.getAttribute('data-hover') === 'light') {
               clientName.style.color = '#f8f8f8';
             }
 
-            //video.play();
-            video.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            video.play();
             assetContainer.style.opacity = 1;
           }
         }
