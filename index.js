@@ -68,7 +68,6 @@ function debounce(func, delay) {
 //   homepageHeroDesktop();
 //   //homepageHeroMobile();
 //   objectsHeroDesktop();
-//   objectsHeroMobile();
 //   objectsSwiper();
 // }
 
@@ -111,10 +110,12 @@ const searchLottie = document.getElementById('search-icon'),
   searchOpen = document.querySelector('.navbar__search'),
   searchClose = document.querySelector('.search-leave-animation');
 
-searchOpen.addEventListener('click', function(){
-  searchLottie.setDirection(1);
-  searchLottie.play();
-});
+if(searchLottie) {
+  searchOpen.addEventListener('click', function(){
+    searchLottie.setDirection(1);
+    searchLottie.play();
+  });
+}
   
 barba.init({
   prefetchIgnore: true,
@@ -158,7 +159,6 @@ barba.init({
     beforeEnter() {
       iframePoster()
       objectsHeroDesktop()
-      objectsHeroMobile()
       objectsHeroLines()
       objectsIndex()
       objectsEnquire()
@@ -691,6 +691,16 @@ function customCursors() {
     element.addEventListener('mouseleave', () => {
       cursors.style.opacity = '1';
     });
+
+    /* so elements inside don't trigger the cursor */
+    element.querySelectorAll('*').forEach(descendant => {
+      descendant.addEventListener('mouseenter', () => {
+        cursors.style.opacity = '0';
+      });
+      descendant.addEventListener('mouseleave', () => {
+        cursors.style.opacity = '1';
+      });
+    });
   });
   
   if (!isTouchDevice()) {
@@ -919,137 +929,139 @@ function projectsIndex() {
   const projects = document.querySelectorAll('.project-index__link'); //get all projects inside the list
   const assetContainer = document.querySelector('.project-index__asset-wrapper'); //get the wrapper for the asset
   
-  //opacity animation for the asset container
-  projectsContainer.addEventListener('mouseenter', () => {
-    let firstMouseMove = true;
+  if (window.matchMedia('(min-width: 992px)').matches) {
+    //opacity animation for the asset container
+    projectsContainer.addEventListener('mouseenter', () => {
+      let firstMouseMove = true;
 
-    projectsContainer.addEventListener('mousemove', function (e) { //no mousemove, mexe o asset container
-      if (firstMouseMove) {
-        assetContainer.style.top = '0';
-        assetContainer.style.left = '0';
-        firstMouseMove = false;
-      }
-
-      assetContainer.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
-    });
-
-    gsap.to(assetContainer, {
-      autoAlpha: 1,
-      duration: 0.25,
-      ease: 'blinking-line',
-    });
-  });
-
-  projectsContainer.addEventListener('mouseleave', () => {
-    gsap.to(assetContainer, {
-      autoAlpha: 0,
-      duration: 0.25,
-      ease: 'blinking-line',
-    });
-  })
-
-  //animation for each project line - asset change
-  projects.forEach((el) => { //em cada item da lista 
-    const assetWrapper = document.querySelector('.project-index__assets'); //vou buscar o container do asset
-    let isVideoPlaying;
-    let singleUrl = el.getAttribute('href');
-
-    el.addEventListener('click', () => {
-      barba.prefetch(singleUrl);
-    });
-
-    el.addEventListener('mouseenter', () => { //no mouseenter
-      let projectImage = el.querySelector('input[name="project-image"]').value, //valor da imagem 
-        projectVideo = el.querySelector('input[name="project-video"]').value; //valor do video id
-      
-      if(projectVideo) { //se existir vídeo
-        let vimeoWrapper = document.createElement('div');
-          vimeoWrapper.className = 'vimeo-wrapper';
-          vimeoWrapper.style.background = 'url(' + projectImage + ') center/cover no-repeat';
-
-        let iframe = document.createElement('iframe');
-          iframe.style.width = '100%';
-          iframe.style.height = '100%';
-          iframe.style.position = 'relative';
-          iframe.src = 'https://player.vimeo.com/video/' + projectVideo + '?background=1&quality=720p&autoplay=1';
-          iframe.allow = 'autoplay';
-          iframe.setAttribute('webkitallowfullscreen', '');
-          iframe.setAttribute('mozallowfullscreen', '');
-          iframe.setAttribute('allowfullscreen', '');
-
-        //create the element
-        vimeoWrapper.appendChild(iframe);
-
-        let projectAsset = document.createElement('div');
-          projectAsset.className = 'project-index__asset';
-          projectAsset.appendChild(vimeoWrapper);
-
-        document.querySelector('.project-index__assets').appendChild(projectAsset); //create the element inside the container
-
-        projectAsset.style.zIndex = 2;
-
-        gsap.set(projectAsset, { autoAlpha: 1 }); 
-
-        gsap.to(projectAsset, {
-          scale: 1.05,  
-          duration: 0.5,
-          ease: 'asset-index',
-        });
-  
-        let player = new Vimeo.Player(iframe);
-
-        player.on('play', function() {
-          vimeoWrapper.style.backgroundImage = 'none';
-          iframe.style.opacity = 1;
-          isVideoPlaying = true; 
-        });
-
-        player.play().catch(function (error) {
-          console.error('Failed to play video:', error);
-          isVideoPlaying = false; //set this to false if play failed
-        });
-      } else if(projectImage) { //se existir imagem 
-        let img = document.createElement('img');
-          img.src = projectImage;
-          img.className = 'project-index__asset';
-
-        document.querySelector('.project-index__assets').appendChild(img);
-
-        img.style.zIndex = 2;
-
-        gsap.set(img, { autoAlpha: 1 }); 
-
-        gsap.to(img, {
-          scale: 1.05,  
-          duration: 0.5,
-          ease: 'asset-index',
-        });
-      }
-    });
-
-    el.addEventListener('mouseleave', () => {
-      let projectAsset = document.querySelector('.project-index__asset:first-of-type');
-      
-      if (projectAsset) {
-        projectAsset.style.zIndex = 1;
-      
-        gsap.to(projectAsset, {
-          autoAlpha: 0,
-          scale: 1,
-          duration: 0.5,
-          ease: 'asset-index',
-          onComplete: function() {
-            //not working with the varibale
-            document.querySelector('.project-index__asset:first-of-type').remove();
-          },
-        });
-
-        if (isVideoPlaying) {
-          isVideoPlaying = false;
+      projectsContainer.addEventListener('mousemove', function (e) { //no mousemove, mexe o asset container
+        if (firstMouseMove) {
+          assetContainer.style.top = '0';
+          assetContainer.style.left = '0';
+          firstMouseMove = false;
         }
-      }
+
+        assetContainer.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
+      });
+
+      gsap.to(assetContainer, {
+        autoAlpha: 1,
+        duration: 0.25,
+        ease: 'blinking-line',
+      });
     });
-  });
+
+    projectsContainer.addEventListener('mouseleave', () => {
+      gsap.to(assetContainer, {
+        autoAlpha: 0,
+        duration: 0.25,
+        ease: 'blinking-line',
+      });
+    })
+
+    //animation for each project line - asset change
+    projects.forEach((el) => { //em cada item da lista 
+      const assetWrapper = document.querySelector('.project-index__assets'); //vou buscar o container do asset
+      let isVideoPlaying;
+      let singleUrl = el.getAttribute('href');
+
+      el.addEventListener('click', () => {
+        barba.prefetch(singleUrl);
+      });
+
+      el.addEventListener('mouseenter', () => { //no mouseenter
+        let projectImage = el.querySelector('input[name="project-image"]').value, //valor da imagem 
+          projectVideo = el.querySelector('input[name="project-video"]').value; //valor do video id
+        
+        if(projectVideo) { //se existir vídeo
+          let vimeoWrapper = document.createElement('div');
+            vimeoWrapper.className = 'vimeo-wrapper';
+            vimeoWrapper.style.background = 'url(' + projectImage + ') center/cover no-repeat';
+
+          let iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.position = 'relative';
+            iframe.src = 'https://player.vimeo.com/video/' + projectVideo + '?background=1&quality=720p&autoplay=1';
+            iframe.allow = 'autoplay';
+            iframe.setAttribute('webkitallowfullscreen', '');
+            iframe.setAttribute('mozallowfullscreen', '');
+            iframe.setAttribute('allowfullscreen', '');
+
+          //create the element
+          vimeoWrapper.appendChild(iframe);
+
+          let projectAsset = document.createElement('div');
+            projectAsset.className = 'project-index__asset';
+            projectAsset.appendChild(vimeoWrapper);
+
+          document.querySelector('.project-index__assets').appendChild(projectAsset); //create the element inside the container
+
+          projectAsset.style.zIndex = 2;
+
+          gsap.set(projectAsset, { autoAlpha: 1 }); 
+
+          gsap.to(projectAsset, {
+            scale: 1.05,  
+            duration: 0.5,
+            ease: 'asset-index',
+          });
+    
+          let player = new Vimeo.Player(iframe);
+
+          player.on('play', function() {
+            vimeoWrapper.style.backgroundImage = 'none';
+            iframe.style.opacity = 1;
+            isVideoPlaying = true; 
+          });
+
+          player.play().catch(function (error) {
+            console.error('Failed to play video:', error);
+            isVideoPlaying = false; //set this to false if play failed
+          });
+        } else if(projectImage) { //se existir imagem 
+          let img = document.createElement('img');
+            img.src = projectImage;
+            img.className = 'project-index__asset';
+
+          document.querySelector('.project-index__assets').appendChild(img);
+
+          img.style.zIndex = 2;
+
+          gsap.set(img, { autoAlpha: 1 }); 
+
+          gsap.to(img, {
+            scale: 1.05,  
+            duration: 0.5,
+            ease: 'asset-index',
+          });
+        }
+      });
+
+      el.addEventListener('mouseleave', () => {
+        let projectAsset = document.querySelector('.project-index__asset:first-of-type');
+        
+        if (projectAsset) {
+          projectAsset.style.zIndex = 1;
+        
+          gsap.to(projectAsset, {
+            autoAlpha: 0,
+            scale: 1,
+            duration: 0.5,
+            ease: 'asset-index',
+            onComplete: function() {
+              //not working with the varibale
+              document.querySelector('.project-index__asset:first-of-type').remove();
+            },
+          });
+
+          if (isVideoPlaying) {
+            isVideoPlaying = false;
+          }
+        }
+      });
+    });
+  }
 }
 
 
@@ -1509,35 +1521,7 @@ function objectsHeroDesktop() {
     });
   }
 }
-  
-function objectsHeroMobile() {
-  if (window.matchMedia('(max-width: 991px)').matches) {
-    setTimeout(() => { 
-      const words = document.querySelectorAll('[data-obj-word]');
-
-      let tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: '.objects-hero',
-          pin: true,
-          scrub: true,
-          anticipatePin: 1,
-        }
-      });
-
-      words.forEach((word, i) => {
-        let code = word.getAttribute('data-obj-word'),
-          image = document.querySelector('[data-obj-video="' + code + '"]');
-
-        tl.to(word, { duration: 1, opacity: 1 })
-          .to(image, { duration: 2, opacity: 1, scale: 1.02, x: gsap.utils.random(-5, 5), y: gsap.utils.random(-10, 10), ease: 'power2.inOut' }, "-=1") 
-          .to(image, { duration: 2, opacity: 0 }, "+=2")
-          .to(word, { duration: 1, opacity: 0.1 }, "-=1") 
-          .to(image, { duration: 0.1, scale: 1, x: 0, y: 0, ease: 'power2.inOut' }, "+=4");
-        });
-    }, 1000);
-  }
-}
-
+ 
 function objectsIndex() {
   const objectsContainer = document.querySelector('[data-index="objects"]');
   const objects = document.querySelectorAll('.objects-index__link');
@@ -1546,98 +1530,100 @@ function objectsIndex() {
   let isVideoPlaying = false;
   let currentAsset;
 
-  //opacity animation for the asset container
-  objectsContainer.addEventListener('mouseenter', () => {
-    let firstMouseMove = true;
+  if (window.matchMedia('(min-width: 992px)').matches) {
+    //opacity animation for the asset container
+    objectsContainer.addEventListener('mouseenter', () => {
+      let firstMouseMove = true;
 
-    objectsContainer.addEventListener('mousemove', function (e) { //no mousemove, mexe o asset container
-      if (firstMouseMove) {
-        assetContainer.style.top = '0';
-        assetContainer.style.left = '0';
-        firstMouseMove = false;
-      }
+      objectsContainer.addEventListener('mousemove', function (e) { //no mousemove, mexe o asset container
+        if (firstMouseMove) {
+          assetContainer.style.top = '0';
+          assetContainer.style.left = '0';
+          firstMouseMove = false;
+        }
 
-      assetContainer.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
+        assetContainer.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
+      });
+
+      gsap.to(assetContainer, {
+        autoAlpha: 1,
+        duration: 0.25,
+        ease: 'blinking-line',
+      });
     });
 
-    gsap.to(assetContainer, {
-      autoAlpha: 1,
-      duration: 0.25,
-      ease: 'blinking-line',
-    });
-  });
+    objectsContainer.addEventListener('mouseleave', () => {
+      gsap.to(assetContainer, {
+        autoAlpha: 0,
+        duration: 0.25,
+        ease: 'blinking-line',
+      });
+    })
 
-  objectsContainer.addEventListener('mouseleave', () => {
-    gsap.to(assetContainer, {
-      autoAlpha: 0,
-      duration: 0.25,
-      ease: 'blinking-line',
-    });
-  })
+    objects.forEach((el, index) => { //em cada item da lista 
+      let singleUrl = el.getAttribute('href');
 
-  objects.forEach((el, index) => { //em cada item da lista 
-    let singleUrl = el.getAttribute('href');
+      el.addEventListener('click', () => {
+        barba.prefetch(singleUrl);
+      });
 
-    el.addEventListener('click', () => {
-      barba.prefetch(singleUrl);
-    });
+      el.addEventListener('mouseenter', () => { //no mouseenter
+        currentAsset = allAssets[index];
+        
+        let iframe = currentAsset.querySelector('iframe'),
+          iframeBackground = currentAsset.querySelector('.vimeo-wrapper');
 
-    el.addEventListener('mouseenter', () => { //no mouseenter
-      currentAsset = allAssets[index];
-      
-      let iframe = currentAsset.querySelector('iframe'),
-        iframeBackground = currentAsset.querySelector('.vimeo-wrapper');
+        if (currentAsset) { //se este elemento da lista tiver asset        
+          currentAsset.style.zIndex = 1;
 
-      if (currentAsset) { //se este elemento da lista tiver asset        
-        currentAsset.style.zIndex = 1;
+          gsap.set(currentAsset, { autoAlpha: 1 }); 
 
-        gsap.set(currentAsset, { autoAlpha: 1 }); 
+          gsap.to(currentAsset, {
+            scale: 1.05,  
+            duration: 0.5,
+            ease: 'asset-index',
+          });
+
+          if (iframe && iframe.dataset.videoId) {
+            iframe.src = iframe.dataset.src; 
+    
+            let player = new Vimeo.Player(iframe);
+    
+            player.on('play', function() {
+              iframeBackground.style.backgroundImage = 'none';
+              iframe.style.opacity = 1;
+              isVideoPlaying = true; 
+            });
+    
+            player.play().catch(function (error) {
+              console.error('Failed to play video:', error);
+              isVideoPlaying = false; //set this to false if play failed
+            });
+          }
+        }
+      });
+
+      el.addEventListener('mouseleave', () => {
+        let iframe = currentAsset.querySelector('iframe');
+
+        currentAsset.style.zIndex = 0;
 
         gsap.to(currentAsset, {
-          scale: 1.05,  
+          autoAlpha: 0,
+          scale: 1,
           duration: 0.5,
           ease: 'asset-index',
         });
 
-        if (iframe && iframe.dataset.videoId) {
-          iframe.src = iframe.dataset.src; 
-  
+        if (iframe && iframe.dataset.videoId && isVideoPlaying) {
           let player = new Vimeo.Player(iframe);
-  
-          player.on('play', function() {
-            iframeBackground.style.backgroundImage = 'none';
-            iframe.style.opacity = 1;
-            isVideoPlaying = true; 
-          });
-  
-          player.play().catch(function (error) {
-            console.error('Failed to play video:', error);
-            isVideoPlaying = false; //set this to false if play failed
-          });
+          
+          player.pause();
+          isVideoPlaying = false;
         }
-      }
-    });
-
-    el.addEventListener('mouseleave', () => {
-      let iframe = currentAsset.querySelector('iframe');
-
-      currentAsset.style.zIndex = 0;
-
-      gsap.to(currentAsset, {
-        autoAlpha: 0,
-        scale: 1,
-        duration: 0.5,
-        ease: 'asset-index',
       });
-
-      if (iframe && iframe.dataset.videoId && isVideoPlaying) {
-        let player = new Vimeo.Player(iframe);
-        
-        player.pause();
-        isVideoPlaying = false;
-      }
     });
-  });
+  };
 }
 
 function objectsSwiper() {
@@ -1792,105 +1778,107 @@ function aboutVideo() {
 function aboutIndexes() {
   const aboutIndexesSections = document.querySelectorAll('.about-three-col'); // Replace with the class that identifies your sections
 
-  aboutIndexesSections.forEach(section => {
-    let indexCode = section.querySelector('[data-index]').getAttribute('data-index');
-    let sectionContainer = document.querySelector(`[data-index=${CSS.escape(indexCode)}]`);
+  if (window.matchMedia('(min-width: 992px)').matches) {
+    aboutIndexesSections.forEach(section => {
+      let indexCode = section.querySelector('[data-index]').getAttribute('data-index');
+      let sectionContainer = document.querySelector(`[data-index=${CSS.escape(indexCode)}]`);
 
-    const indexes = section.querySelectorAll('.about-three-col__link');
-    const allAssets = section.querySelectorAll('.about-three-col__assets'); //get all images/videos
-    const assetContainer = section.querySelector('.about-three-col__asset-wrapper'); //get the wrapper for the asset
-    let isVideoPlaying = false;
-    let currentAsset;
+      const indexes = section.querySelectorAll('.about-three-col__link');
+      const allAssets = section.querySelectorAll('.about-three-col__assets'); //get all images/videos
+      const assetContainer = section.querySelector('.about-three-col__asset-wrapper'); //get the wrapper for the asset
+      let isVideoPlaying = false;
+      let currentAsset;
 
-    //opacity animation for the asset container
-    sectionContainer.addEventListener('mouseenter', () => {
-      let firstMouseMove = true;
+      //opacity animation for the asset container
+      sectionContainer.addEventListener('mouseenter', () => {
+        let firstMouseMove = true;
 
-      sectionContainer.addEventListener('mousemove', function (e) { //no mousemove, mexe o asset container
-        if (firstMouseMove) {
-          assetContainer.style.top = '0';
-          assetContainer.style.left = '0';
-          firstMouseMove = false;
-        }
+        sectionContainer.addEventListener('mousemove', function (e) { //no mousemove, mexe o asset container
+          if (firstMouseMove) {
+            assetContainer.style.top = '0';
+            assetContainer.style.left = '0';
+            firstMouseMove = false;
+          }
 
-        assetContainer.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
+          assetContainer.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
+        });
+
+        gsap.to(assetContainer, {
+          autoAlpha: 1,
+          duration: 0.25,
+          ease: 'blinking-line',
+        });
       });
 
-      gsap.to(assetContainer, {
-        autoAlpha: 1,
-        duration: 0.25,
-        ease: 'blinking-line',
-      });
-    });
-
-    sectionContainer.addEventListener('mouseleave', () => {
-      gsap.to(assetContainer, {
-        autoAlpha: 0,
-        duration: 0.25,
-        ease: 'blinking-line',
-      });
-    })
+      sectionContainer.addEventListener('mouseleave', () => {
+        gsap.to(assetContainer, {
+          autoAlpha: 0,
+          duration: 0.25,
+          ease: 'blinking-line',
+        });
+      })
 
 
-    //animation for each project line 
-    indexes.forEach((el, index) => { //em cada item da lista 
-      el.addEventListener('mouseenter', () => { //no mouseenter
-        currentAsset = allAssets[index];
+      //animation for each project line 
+      indexes.forEach((el, index) => { //em cada item da lista 
+        el.addEventListener('mouseenter', () => { //no mouseenter
+          currentAsset = allAssets[index];
 
-        let iframe = currentAsset.querySelector('iframe'),
-          iframeBackground = currentAsset.querySelector('.vimeo-wrapper');
+          let iframe = currentAsset.querySelector('iframe'),
+            iframeBackground = currentAsset.querySelector('.vimeo-wrapper');
 
-        if (currentAsset) { //se este elemento da lista tiver asset
-          currentAsset.style.zIndex = 1;
+          if (currentAsset) { //se este elemento da lista tiver asset
+            currentAsset.style.zIndex = 1;
 
-          gsap.set(currentAsset, { autoAlpha: 1 }); 
+            gsap.set(currentAsset, { autoAlpha: 1 }); 
 
+            gsap.to(currentAsset, {
+              scale: 1.05,  
+              duration: 0.5,
+              ease: 'asset-index',
+            });
+
+            if (iframe && iframe.dataset.videoId) {
+              iframe.src = iframe.dataset.src; 
+      
+              let player = new Vimeo.Player(iframe);
+      
+              player.on('play', function() {
+                iframeBackground.style.backgroundImage = 'none';
+                iframe.style.opacity = 1;
+                isVideoPlaying = true; 
+              });
+      
+              player.play().catch(function (error) {
+                console.error('Failed to play video:', error);
+                isVideoPlaying = false; //set this to false if play failed
+              });
+            }
+          }
+        });
+
+        el.addEventListener('mouseleave', () => {
+          let iframe = currentAsset.querySelector('iframe');
+
+          currentAsset.style.zIndex = 0;
+        
           gsap.to(currentAsset, {
-            scale: 1.05,  
+            autoAlpha: 0,
+            scale: 1,
             duration: 0.5,
             ease: 'asset-index',
           });
 
-          if (iframe && iframe.dataset.videoId) {
-            iframe.src = iframe.dataset.src; 
-    
+          if (iframe && iframe.dataset.videoId && isVideoPlaying) {
             let player = new Vimeo.Player(iframe);
-    
-            player.on('play', function() {
-              iframeBackground.style.backgroundImage = 'none';
-              iframe.style.opacity = 1;
-              isVideoPlaying = true; 
-            });
-    
-            player.play().catch(function (error) {
-              console.error('Failed to play video:', error);
-              isVideoPlaying = false; //set this to false if play failed
-            });
+            
+            player.pause();
+            isVideoPlaying = false;
           }
-        }
-      });
-
-      el.addEventListener('mouseleave', () => {
-        let iframe = currentAsset.querySelector('iframe');
-
-        currentAsset.style.zIndex = 0;
-       
-        gsap.to(currentAsset, {
-          autoAlpha: 0,
-          scale: 1,
-          duration: 0.5,
-          ease: 'asset-index',
         });
-
-        if (iframe && iframe.dataset.videoId && isVideoPlaying) {
-          let player = new Vimeo.Player(iframe);
-          
-          player.pause();
-          isVideoPlaying = false;
-        }
       });
-    });
-  })
+    })
+  };
 }
 
 function locationHover() {
