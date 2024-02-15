@@ -665,6 +665,10 @@ function hoverTyping() {
   });
 }
 
+if (!isTouchDevice()) { //so it works when there's no barba action
+  hoverTyping();
+}
+
 /** FOR TRANSITIONS */
 function resetWebflow(data) {
   const parser = new DOMParser();
@@ -855,14 +859,18 @@ function homepageHeroDesktop() { //add hover state to clients hero
         isVideoLoaded = false,
         isMouseOver = false; //so videos dont play right away when they're ready, only when hovered
 
-      if (video.readyState >= 2) { //the video was loaded already
-        isVideoLoaded = true;
-        checkMouseOver();
-      } else {
-        video.addEventListener('canplay', function() { //the video is loaded for the 1st time 
+      if(video) {
+        if (video.readyState >= 2) { //the video was loaded already
           isVideoLoaded = true;
           checkMouseOver();
-        });
+        } else {
+          video.addEventListener('canplay', function() { //the video is loaded for the 1st time 
+            isVideoLoaded = true;
+            checkMouseOver();
+          });
+        }
+      } else {
+        isVideoLoaded = true
       }
 
       el.addEventListener('mouseover', () => {
@@ -877,7 +885,9 @@ function homepageHeroDesktop() { //add hover state to clients hero
         assetContainer.style.opacity = 0;
         clientName.style.color = '#070707';
 
-        video.pause();
+        if(video) {
+          video.pause();
+        }
       });
 
       function checkMouseOver() {
@@ -891,7 +901,10 @@ function homepageHeroDesktop() { //add hover state to clients hero
               clientName.style.color = '#f8f8f8';
             }
 
-            video.play();
+            if(video) {
+              video.play();
+            }
+
             assetContainer.style.opacity = 1;
           }
         }
