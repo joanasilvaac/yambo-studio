@@ -217,6 +217,12 @@ barba.init({
           },
           onComplete: () => {
             data.next.container.classList.remove('fixed');
+
+            setTimeout(() => {
+              if(document.querySelector('.project-hero')) {
+                document.querySelector('.project-hero').style.opacity = '1';
+              }
+            }, 100);
           }
         }
       );
@@ -1830,30 +1836,42 @@ function objectsDownload() {
 
 /** ABOUT */
 function aboutVideo() {
-  if (window.matchMedia('(min-width: 992px)').matches) {
-    setTimeout(() => { //wait for the barbajs finish the transition, otherwise the containers would be on top of each other and the start/end point would be calculated wrong
-      let videoWrapper = document.querySelector('#aboutVideo'),
-        aboutIframe = videoWrapper.querySelector('iframe'),
-        aboutVideo = new Vimeo.Player(aboutIframe);
-      
-      aboutVideo.pause();
+  setTimeout(() => { //wait for the barbajs finish the transition, otherwise the containers would be on top of each other and the start/end point would be calculated wrong
+    let videoWrapper = document.querySelector('#aboutVideo'),
+      aboutIframe = videoWrapper.querySelector('iframe'),
+      aboutVideo = new Vimeo.Player(aboutIframe);
+    
+    aboutVideo.pause();
 
-      ScrollTrigger.create({
-        trigger: videoWrapper,
-        start: 'top center',
-        end: 'bottom center',
-        //markers: true,
-        onEnter: () => aboutVideo.play(),
-        onEnterBack: () => aboutVideo.play(),
-        onLeave: () => aboutVideo.pause(),
-        onLeaveBack: () => aboutVideo.pause(),
-      });
+    ScrollTrigger.matchMedia({	
+      '(min-width: 992px)': function() {
+        ScrollTrigger.create({
+          trigger: videoWrapper,
+          start: 'top center',
+          end: 'bottom center',
+          onEnter: () => aboutVideo.play(),
+          onEnterBack: () => aboutVideo.play(),
+          onLeave: () => aboutVideo.pause(),
+          onLeaveBack: () => aboutVideo.pause(),
+        });
+      },
+      '(max-width: 991px)': function() {
+        ScrollTrigger.create({
+          trigger: videoWrapper,
+          start: 'top bottom-=10%',
+          end: 'bottom top+=10%',
+          onEnter: () => aboutVideo.play(),
+          onEnterBack: () => aboutVideo.play(),
+          onLeave: () => aboutVideo.pause(),
+          onLeaveBack: () => aboutVideo.pause(),
+        });
+      }
+    });
 
-      aboutVideo.on('play', function() {
-        aboutIframe.style.opacity = 1; //for the poster, not using iframeVideo function because it would create another player
-      });
-    }, 1000);
-  };
+    aboutVideo.on('play', function() {
+      aboutIframe.style.opacity = 1; //for the poster, not using iframeVideo function because it would create another player
+    });
+  }, 1000);
 }
 
 function aboutIndexes() {
