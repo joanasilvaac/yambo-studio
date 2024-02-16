@@ -161,6 +161,7 @@ barba.init({
       objectsHeroDesktop()
       objectsHeroLines()
       objectsIndex()
+      enquireHover()
       objectsEnquire()
     }, 
   },{
@@ -176,7 +177,7 @@ barba.init({
     beforeEnter() {
       searchEnter()
       search()
-    }
+    },
   }, {
     namespace: 'error',
     beforeEnter() {
@@ -399,8 +400,8 @@ barba.init({
         });
     
         data.next.container.classList.add('fixed');
-        document.querySelector('.navbar__search').classList.add('clickable-off'); //so you can't trigger the page again
-        
+        //document.querySelector('.navbar__search').classList.add('clickable-off'); //so you can't trigger the page again
+
         //reveal page 
         return gsap.fromTo(
           data.next.container,
@@ -435,7 +436,8 @@ barba.init({
           y: -50,
           onComplete: () => {
             document.querySelector('.search-input__wrapper').classList.remove('active');
-            document.querySelector('.navbar__search').classList.remove('clickable-off');
+            document.querySelector('.navbar__search').removeEventListener('click', searchIconHandler);
+            //document.querySelector('.navbar__search').classList.remove('clickable-off');
           }
         });
       },
@@ -1639,6 +1641,76 @@ function objectsIndex() {
   };
 }
 
+function enquireHover() {
+  const hoverEls = document.querySelectorAll('[data-hover="enquire"]');
+        
+  hoverEls.forEach((element) => {
+    let sibling = element.nextElementSibling,
+      hasHover = false, 
+      splitHover, hoverChars;
+
+    if(sibling.classList.contains('enquire-button__hover') && sibling.textContent.trim().length > 0) {
+      hasHover = true,
+      splitHover = new SplitText(sibling, { type: 'words,chars' }),
+      hoverChars = splitHover.chars;
+    }
+
+    let splitInitial = new SplitText(element, { type: 'words,chars' }),
+      initialChars = splitInitial.chars;
+
+    let elementTimeline = gsap.timeline({ paused: true });
+    elementTimeline.addLabel('start');
+
+    element.addEventListener('mouseenter', () => {
+      if (!elementTimeline.isActive()) {
+        elementTimeline.clear().seek('start'); //so it always finishes
+
+        if(hasHover) {
+          element.style.opacity = '0';
+          sibling.style.opacity = '1';
+
+          elementTimeline.from(hoverChars, {
+            duration: 0.01,
+            opacity: 0,
+            ease: 'none',
+            stagger: 0.05,
+          });
+        } else {
+          elementTimeline.from(initialChars, {
+            duration: 0.01,
+            opacity: 0,
+            ease: 'none',
+            stagger: 0.05,
+          });
+        }
+       
+        elementTimeline.play();
+      }
+    });
+
+    if(hasHover) {
+      let leaveTimeline = gsap.timeline({ paused: true });
+        leaveTimeline.addLabel('start');
+
+      element.addEventListener('mouseleave', () => {
+        if (!leaveTimeline.isActive()) {
+          leaveTimeline.clear().seek('start'); //so it always finishes
+  
+          leaveTimeline.to(sibling, {
+            duration: 0.25,
+            opacity: 0
+          }).to(element, {
+            duration: 0.25,
+            opacity: 1
+          });
+  
+          leaveTimeline.play();
+        }
+      });
+    }
+  });
+}
+
 function objectsSwiper() {
   let objectsSwiper;
 
@@ -1722,25 +1794,19 @@ function objectsEnquire() {
 
   gsap.set(document.querySelector('.enquire-close'), { opacity: 0, y: 5 });
   
-  // document.querySelectorAll('.objects-index__link-wrapper').forEach(function(link) {
-  //   link.addEventListener('mouseover', () => {
-  //     link.querySelector('.enquire-button').style.opacity = '1';
-  //     link.querySelector('.objects-index__link').style.opacity = '1';
-  //   });
-    
-  //   link.addEventListener('mouseout', () => {
-  //     link.querySelector('.enquire-button').style.opacity = '0.5';
-  //     link.querySelector('.objects-index__link').style.opacity = '0.5';
-  //   });
-  // });
-
   document.querySelectorAll('.enquire-button').forEach(function(button) {
-    if(button.textContent!='--') {
+    let availability = button.textContent;
+
+    if(availability=='Enquire') {
       button.addEventListener('click', function() {
         enquireModel.classList.add('active');
         animateEnquire();
         navigator.clipboard.writeText(emailToCopy);
       });
+    } else if(availability=='On loan') {
+      console.log('on loan')
+    } else {
+      button.style.pointerEvents = 'none';
     }
   });
 
@@ -1764,28 +1830,30 @@ function objectsDownload() {
 
 /** ABOUT */
 function aboutVideo() {
-  setTimeout(() => { //wait for the barbajs finish the transition, otherwise the containers would be on top of each other and the start/end point would be calculated wrong
-    let videoWrapper = document.querySelector('#aboutVideo'),
-      aboutIframe = videoWrapper.querySelector('iframe'),
-      aboutVideo = new Vimeo.Player(aboutIframe);
-    
-    aboutVideo.pause();
+  if (window.matchMedia('(min-width: 992px)').matches) {
+    setTimeout(() => { //wait for the barbajs finish the transition, otherwise the containers would be on top of each other and the start/end point would be calculated wrong
+      let videoWrapper = document.querySelector('#aboutVideo'),
+        aboutIframe = videoWrapper.querySelector('iframe'),
+        aboutVideo = new Vimeo.Player(aboutIframe);
+      
+      aboutVideo.pause();
 
-    ScrollTrigger.create({
-      trigger: videoWrapper,
-      start: 'top center',
-      end: 'bottom center',
-      //markers: true,
-      onEnter: () => aboutVideo.play(),
-      onEnterBack: () => aboutVideo.play(),
-      onLeave: () => aboutVideo.pause(),
-      onLeaveBack: () => aboutVideo.pause(),
-    });
+      ScrollTrigger.create({
+        trigger: videoWrapper,
+        start: 'top center',
+        end: 'bottom center',
+        //markers: true,
+        onEnter: () => aboutVideo.play(),
+        onEnterBack: () => aboutVideo.play(),
+        onLeave: () => aboutVideo.pause(),
+        onLeaveBack: () => aboutVideo.pause(),
+      });
 
-    aboutVideo.on('play', function() {
-      aboutIframe.style.opacity = 1; //for the poster, not using iframeVideo function because it would create another player
-    });
-  }, 1000);
+      aboutVideo.on('play', function() {
+        aboutIframe.style.opacity = 1; //for the poster, not using iframeVideo function because it would create another player
+      });
+    }, 1000);
+  };
 }
 
 function aboutIndexes() {
@@ -1943,6 +2011,13 @@ function aboutSectionsHover() { //only for the 2 cols
 }
 
 /** SEARCH */
+function searchIconHandler(event) {
+  let resetButton = document.querySelector('.search-reset');
+
+  event.preventDefault();
+  resetButton.click();
+}
+
 function searchEnter() { //so it works on refresh
   setTimeout(function() {
     document.querySelector('.search-input__wrapper').classList.add('active');  
@@ -1950,6 +2025,9 @@ function searchEnter() { //so it works on refresh
     setTimeout(function() {
       document.getElementById('search').focus();
     }, 600);
+    
+    /* change behavior of search icon*/
+    document.querySelector('.navbar__search').addEventListener('click', searchIconHandler);
   }, 800);
 }
 
