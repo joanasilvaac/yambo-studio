@@ -4,21 +4,7 @@ function isTouchDevice() {
     (navigator.msMaxTouchPoints > 0);
 }
 
-/* disable scroll */
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.menu-toggle').forEach(trigger => {
-    trigger.addEventListener('click', function(){ 
-      this.x = ((this.x || 0) + 1)%2; 
-      if(this.x){ 
-        document.querySelectorAll('body').forEach(target => target.classList.add('disable-scroll'));
-      }
-      else{ 
-        document.querySelectorAll('body').forEach(target => target.classList.remove('disable-scroll'));
-      } 
-    });
-  });
-});
-
+const remToPixels = (rem) => rem * 16;
 
 /* cookie banner */
 let cookieBanner = document.querySelector('.cookie-banner'), 
@@ -55,26 +41,14 @@ $(window).on('mouseout', function(){
 });
 
 
-/* reload automatically */
+/* reload automatically, script that needs to be updated on resize */
 let resizeTimeout;
 
 function debounce(func, delay) {
   clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(func, delay);
-}
-
-// function onWindowResize() {
-//   stickyReturn();
-//   homepageHeroDesktop();
-//   //homepageHeroMobile();
-//   objectsHeroDesktop();
-//   objectsSwiper();
-// }
-
-// window.addEventListener('resize', function () {
-//   debounce(onWindowResize, 1000); // 1000 milliseconds (1 second) delay
-// });
-
+  resizeTimeout = setTimeout(func, delay); 
+} 
+//the indiviual resize is being checked on afterEnter of each page, so i don't call the script in the wrong page
 
 /* register the gsap plugins */
 gsap.registerPlugin(ScrollTrigger);
@@ -90,6 +64,8 @@ const cleanGSAP = () => {
 	ScrollTrigger.refresh();
 };
 
+
+/* barba configs */
 barba.hooks.beforeEnter(function() { //only things that are common to all pages
   cleanGSAP()
   customCursors()
@@ -99,13 +75,14 @@ barba.hooks.beforeEnter(function() { //only things that are common to all pages
 barba.hooks.after(function(data) {
   resetWebflow(data);
 
-  if (!isTouchDevice()) {
+  if (!isTouchDevice()) { 
     hoverTyping();
   }
 });
 
-let scrollY = 0;
+let scrollY = 0; //set initial scroll position for page change
 
+/* search animation related */
 const searchLottie = document.getElementById('search-icon'),
   searchOpen = document.querySelector('.navbar__search'),
   searchClose = document.querySelector('.search-leave-animation');
@@ -124,10 +101,21 @@ barba.init({
   views: [{
     namespace: 'home',
     beforeEnter() {
-      homepageHeroDesktop()
-      //homepageHeror()
       homepageHeroLines()
+      homepageHeroDesktop()
       projectsIndex()
+    }, 
+    afterEnter() {
+      //flag resize
+      function homepageResize() {
+        homepageHeroLines();
+        homepageHeroDesktop();
+        //homepageHeroMobile();
+        projectsIndex();
+      }
+      window.addEventListener('resize', function () {
+        debounce(homepageResize, 1000); // 1 second delay after resize
+      });
     }
   }, {
     namespace: 'projects',
@@ -142,17 +130,15 @@ barba.init({
       document.querySelector('.project-hero').style.opacity = '1';
       projectsNavigation()
       projectSrollAnimations()
-    }
-  }, {
-    namespace: 'about',
-    beforeEnter() {
-      iframePoster()
-      aboutIndexes()
-      locationHover()
-      aboutSectionsHover() //only for the 2 cols
-    }, 
-    afterEnter() {
-      aboutVideo()
+
+      //flag resize
+      function projectResize() {
+        scrollDownAnimation();
+        stickyReturn();
+      }
+      window.addEventListener('resize', function () {
+        debounce(projectResize, 1000); // 1 second delay after resize
+      });
     }
   }, {
     namespace: 'objects',
@@ -164,14 +150,56 @@ barba.init({
       enquireHover()
       objectsEnquire()
     }, 
+    afterEnter() {
+      //flag resize
+      function objectsResize() {
+        objectsHeroLines();
+        objectsHeroDesktop();
+        objectsIndex();
+        enquireHover();
+        objectsEnquire()
+      }
+      window.addEventListener('resize', function () {
+        debounce(objectsResize, 1000); // 1 second delay after resize
+      });
+    }
   },{
     namespace: 'objects-single',
     beforeEnter() {
       iframePoster()
-      objectsSwiper()
       objectsDownload()
       carouselAnimation()
     }, 
+    afterEnter() {
+      objectsSwiper()
+
+      //flag resize
+      function objectSingleResize() {
+        objectsSwiper();
+      }
+      window.addEventListener('resize', function () {
+        debounce(objectSingleResize, 1000); // 1 second delay after resize
+      });
+    }
+  }, {
+    namespace: 'about',
+    beforeEnter() {
+      iframePoster()
+      aboutIndexes()
+      locationHover()
+      aboutSectionsHover() //only for the 2 cols
+    }, 
+    afterEnter() {
+      aboutVideo()
+
+      //flag resize
+      function aboutResize() {
+        aboutIndexes();
+      }
+      window.addEventListener('resize', function () {
+        debounce(aboutResize, 1000); // 1 second delay after resize
+      });
+    }
   }, {
     namespace: 'search',
     beforeEnter() {
@@ -218,7 +246,7 @@ barba.init({
           onComplete: () => {
             data.next.container.classList.remove('fixed');
 
-            setTimeout(() => {
+            setTimeout(() => { //show hero on project singles
               if(document.querySelector('.project-hero')) {
                 document.querySelector('.project-hero').style.opacity = '1';
               }
@@ -301,7 +329,6 @@ barba.init({
             window.scrollTo({
               top: scrollY,
               left: 0,
-
             });
           },
         }
@@ -382,7 +409,6 @@ barba.init({
               window.scrollTo({
                 top: scrollY,
                 left: 0,
-  
               });
             },
           }
@@ -405,8 +431,7 @@ barba.init({
           duration: 1,
         });
     
-        data.next.container.classList.add('fixed');
-        //document.querySelector('.navbar__search').classList.add('clickable-off'); //so you can't trigger the page again
+        data.next.container.classList.add('fixed'); 
 
         //reveal page 
         return gsap.fromTo(
@@ -416,9 +441,9 @@ barba.init({
             opacity: 1, 
             onStart: () => {
               window.scrollTo({
-              top: 0,
-              left: 0,
-              behavior: 'smooth'
+                top: 0,
+                left: 0,
+                behavior: 'smooth'
               });
             },
             onComplete: () => {
@@ -443,7 +468,6 @@ barba.init({
           onComplete: () => {
             document.querySelector('.search-input__wrapper').classList.remove('active');
             document.querySelector('.navbar__search').removeEventListener('click', searchIconHandler);
-            //document.querySelector('.navbar__search').classList.remove('clickable-off');
           }
         });
       },
@@ -479,10 +503,6 @@ barba.init({
 });
 
 
-/** ---- until here it was directly on custom code ---- */
-
-const remToPixels = (rem) => rem * 16;
-
 /* Smooth scroll */
 const lenis = new Lenis();
 
@@ -494,7 +514,22 @@ gsap.ticker.add((time) => {
 
 gsap.ticker.lagSmoothing(0);
 
-/* logo interaction */
+
+/* For transitions */
+function resetWebflow(data) {
+  const parser = new DOMParser();
+  const dom = parser.parseFromString(data.next.html, "text/html");
+  const webflowPageId = dom.querySelector("html").getAttribute("data-wf-page");
+  document.querySelector("html").setAttribute("data-wf-page", webflowPageId);
+  if (window.Webflow) {
+    window.Webflow.destroy();
+    window.Webflow.ready();
+    window.Webflow.require("ix2").init();
+  }
+}
+
+
+/* Logo interaction */
 if (!isTouchDevice()) {
   let text = new SplitText('.navbar__logo', { type: "chars" }),
     letters = text.chars;
@@ -635,6 +670,7 @@ if (!isTouchDevice()) {
 
 /* Remove blinking spans from touch devices */
 if (isTouchDevice()) {
+  console.log('it is touch device')
   let blinkingSpans = document.querySelectorAll('.blinking-span'),
     nestedBlinking = document.querySelectorAll('.nested-blinking-span');
 
@@ -673,29 +709,17 @@ function hoverTyping() {
   });
 }
 
-if (!isTouchDevice()) { //so it works when there's no barba action
+if (!isTouchDevice()) { //so it works when there's no barba action too
   hoverTyping();
 }
 
-/** FOR TRANSITIONS */
-function resetWebflow(data) {
-  const parser = new DOMParser();
-  const dom = parser.parseFromString(data.next.html, "text/html");
-  const webflowPageId = dom.querySelector("html").getAttribute("data-wf-page");
-  document.querySelector("html").setAttribute("data-wf-page", webflowPageId);
-  if (window.Webflow) {
-    window.Webflow.destroy();
-    window.Webflow.ready();
-    window.Webflow.require("ix2").init();
-  }
-}
 
 /** CURSOR */
 function customCursors() {
   const cursors = document.querySelector('.cursor-wrapper');
   const customCursors = document.querySelectorAll('[data-cursor]');
 
-  document.querySelectorAll('a, button, [data-cursor-hover="true"], .proj-16x9-video, .proj-1x1-video, [data-animation-type="spline"]').forEach(element => {
+  document.querySelectorAll('a, button, [data-cursor-hover="true"], .proj-16x9-video, .proj-1x1-video, .proj-4x5-video, .proj-9x16-video, .proj-wide-video,  [data-animation-type="spline"]').forEach(element => {
     element.addEventListener('mouseenter', () => {
       cursors.style.opacity = '0';
     });
@@ -716,12 +740,12 @@ function customCursors() {
   });
   
   if (!isTouchDevice()) {
-    // Move the cursors with the mouse position
+    // move the cursors with the mouse position
     document.addEventListener('pointermove', (e) => {
       cursors.style.transform = `translate(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%))`
     });
   
-    // Check if a custom cursor is needed
+    // check if a custom cursor is needed
     customCursors.forEach(element => {
       element.addEventListener('mouseenter', () => {
         toggleCursorDefault();
@@ -765,7 +789,7 @@ function customCursors() {
       });
     });
 
-    // Toggle default cursor visibility
+    // toggle default cursor visibility
     function toggleCursorDefault(){
       const cursor = document.querySelector('.cursor-default');
 
@@ -776,19 +800,17 @@ function customCursors() {
       }
     }
   } else {
-    cursors.style.display = 'none';
+    cursors.style.display = 'none'; //hide all cursors on mobile
   }
 }
 
-
 function iframePoster() {
 	document.querySelectorAll("[data-vimeo-poster='true']").forEach(function(componentEl) {
-    const iframeEl = componentEl.querySelector("iframe");
+    const iframeEl = componentEl.querySelector('iframe');
     let player = new Vimeo.Player(iframeEl);
 
-    player.on("play", function() {
+    player.on('play', function() {
       iframeEl.style.opacity = 1;
-      //componentEl.querySelector('.vimeo-wrapper').style.background = 'transparent';
     });
 	})
 }
@@ -802,7 +824,7 @@ function currentYear() {
   })
 }
 
-/* Hide/Show scrollbar */
+/* hide/show scrollbar, used for objects singles carousel */
 function hideScrollbar() {
   document.body.classList.add('hide-scrollbar');
 }
@@ -847,7 +869,7 @@ function homepageHeroLines() {
   }
 }
 
-function homepageHeroDesktop() { //add hover state to clients hero
+function homepageHeroDesktop() { 
   if (window.matchMedia('(min-width: 992px)').matches) {
     //the hover effect to not trigger the "sensitive" area with css
     $('.hero__client-link').hover(function() {
@@ -946,11 +968,11 @@ function homepageHeroDesktop() { //add hover state to clients hero
 // }
 
 function projectsIndex() {
-  const projectsContainer = document.querySelector('[data-index="projects"]');
-  const projects = document.querySelectorAll('.project-index__link'); //get all projects inside the list
-  const assetContainer = document.querySelector('.project-index__asset-wrapper'); //get the wrapper for the asset
-  
   if (window.matchMedia('(min-width: 992px)').matches) {
+    const projectsContainer = document.querySelector('[data-index="projects"]');
+    const projects = document.querySelectorAll('.project-index__link'); //get all projects inside the list
+    const assetContainer = document.querySelector('.project-index__asset-wrapper'); //get the wrapper for the asset
+  
     //opacity animation for the asset container
     projectsContainer.addEventListener('mouseenter', () => {
       let firstMouseMove = true;
@@ -1088,33 +1110,37 @@ function projectsIndex() {
 
 /** PROJECTS */
 function scrollDownAnimation() {
-  let scrollEl = document.querySelector('.btn-project-scroll');
+  if (window.matchMedia('(min-width: 992px)').matches) {
+    setTimeout(() => { //wait for barbajs transition
+      let scrollEl = document.querySelector('.btn-project-scroll');
 
-  scrollEl.addEventListener('mouseenter', function() { 
-    gsap.to('.btn-project-scroll__word', {
-      duration: 0.5,
-      y: 10,
-      ease: 'power1.inOut',
-      stagger: 0.2,
-    });
-  });
+      scrollEl.addEventListener('mouseenter', function() { 
+        gsap.to('.btn-project-scroll__word', {
+          duration: 0.4,
+          y: 10,
+          ease: 'power1.inOut',
+          stagger: 0.1,
+        });
+      });
 
-  scrollEl.addEventListener('mouseleave', function() {
-    gsap.to('.btn-project-scroll__word', {
-      duration: 0.5,
-      y: 0,
-      ease: 'power1.inOut',
-      stagger: 0.2,
-    });
-  });
+      scrollEl.addEventListener('mouseleave', function() {
+        gsap.to('.btn-project-scroll__word', {
+          duration: 0.4,
+          y: 0,
+          ease: 'power1.inOut',
+          stagger: 0.1,
+        });
+      });
 
-  document.querySelector('.btn-project-scroll').addEventListener('click', function () {
-    const scrollPin = document.querySelector('.scroll-to-placeholder');
-    window.scrollTo({
-    top: scrollPin.offsetTop,
-    behavior: "smooth"
-    });
-  });
+      document.querySelector('.btn-project-scroll').addEventListener('click', function () {
+        const scrollPin = document.querySelector('.scroll-to-placeholder');
+        window.scrollTo({
+          top: scrollPin.offsetTop - 110,
+          behavior: 'smooth'
+        });
+      });
+    }, 1000); 
+  }
 }
   
 function projectsSwiper() {
@@ -1250,24 +1276,23 @@ function videoComponent() {
     const coverEl = componentEl.querySelector("[js-vimeo-element='cover']");
     const coverImage = componentEl.querySelector("[js-vimeo-element='media']");
     const timeline =  componentEl.querySelector(".proj-video-timeline");
-    let hideCover = false;
 
     let player = new Vimeo.Player(iframeEl);
 
-    player.on("play", function() {
-      componentEl.classList.add("is-playing");
+    player.on('play', function() {
+      componentEl.classList.add('is-playing');
     });
 
-    player.on("pause", function() {      
-      componentEl.classList.remove("is-playing");
-      coverEl.style.cssText = "opacity: 1;";
+    player.on('pause', function() {      
+      componentEl.classList.remove('is-playing');
+      coverEl.style.cssText = 'opacity: 1;';
     });
 
-    coverEl.addEventListener("click", function() { // when clicking the cover 
-      coverEl.style.cssText = "opacity: 0;";
-      coverImage.style.cssText = "opacity: 0";
+    coverEl.addEventListener('click', function() { // when clicking the cover 
+      coverEl.style.cssText = 'opacity: 0;';
+      coverImage.style.cssText = 'opacity: 0';
 
-      if (componentEl.classList.contains("is-playing")) {
+      if (componentEl.classList.contains('is-playing')) {
         player.pause();
       } else {
         player.play();
@@ -1289,7 +1314,7 @@ function videoComponent() {
 }
 
 function stickyReturn() { 
-  if (window.matchMedia('(min-width: 767px)').matches) { //tablet on only
+  if (window.matchMedia('(min-width: 768px)').matches) { //from tablet on
     setTimeout(() => { //wait for the barbajs finish the transition
       let heroButtons = document.querySelector('.project-hero__buttons'),
         backButton = heroButtons.querySelector('.project-hero__back');
@@ -1407,7 +1432,6 @@ function projectSrollAnimations() {
                 trigger: el,
                 start: 'top-=40 bottom-=100',
                 end: 'bottom bottom',
-                //markers: true,
               },
               onComplete:function() {
                 el.classList.add('animated')
@@ -1423,8 +1447,8 @@ function projectSrollAnimations() {
 
       elements.forEach((el) => {
         const splitLines = new SplitText(el.querySelector('.proj-text__paragraph'), {
-          type: "lines",
-          linesClass: "line line++"
+          type: 'lines',
+          linesClass: 'line line++'
         });
 
         const blockLink = el.querySelector('.proj-text-block__link');
@@ -1434,8 +1458,7 @@ function projectSrollAnimations() {
           scrollTrigger: {
             trigger: el,
             start: 'top-=40 bottom-=200',
-            end: "bottom bottom",
-            //markers: true,
+            end: 'bottom bottom',
           },
         });
 
@@ -1468,6 +1491,8 @@ function objectsHeroLines() {
     document.fonts.ready.then(function () {
       let objectsHeroText = document.querySelector('.objects-hero__text');
 
+      gsap.set(document.querySelector('.objects-hero'), { opacity: 1} )
+
       const splitLines = new SplitText(objectsHeroText, {
         type: 'lines',
         linesClass: 'line line++'
@@ -1496,19 +1521,19 @@ function objectsHeroLines() {
 }
 
 function objectsHeroDesktop() { 
-  //when videos are ready, show the container
-  document.querySelectorAll('.objects-hero__assets .vimeo-wrapper').forEach(function(componentEl) {
-    const iframeEl = componentEl.querySelector('iframe');
-    const wrapper = document.querySelector('.objects-hero__assets');
-    let player = new Vimeo.Player(iframeEl);
-
-    player.on('play', function() {
-      iframeEl.style.opacity = 1;
-      wrapper.style.opacity = 1;
-    });
-	});
-  
   if (window.matchMedia('(min-width: 992px)').matches) {
+    // when videos are ready, show the container
+    document.querySelectorAll('.objects-hero__assets .vimeo-wrapper').forEach(function(componentEl) {
+      const iframeEl = componentEl.querySelector('iframe');
+      const wrapper = document.querySelector('.objects-hero__assets');
+      let player = new Vimeo.Player(iframeEl);
+
+      player.on('play', function() {
+        iframeEl.style.opacity = 1;
+        wrapper.style.opacity = 1;
+      });
+    });
+
     const heroWords = document.querySelectorAll('[data-obj-word]');
     const images = document.querySelectorAll('[data-obj-video]');
     let activeImage = images[0]; // select the activeImage = active asset, start with first one (its called image cause it wasnt suppose to have video initially)
@@ -1544,15 +1569,15 @@ function objectsHeroDesktop() {
 }
  
 function objectsIndex() {
-  const objectsContainer = document.querySelector('[data-index="objects"]');
-  const objects = document.querySelectorAll('.objects-index__link');
-  const allAssets = document.querySelectorAll('.objects-index__assets'); //get all images/videos
-  const assetContainer = document.querySelector('.objects-index__asset-wrapper'); //get the wrapper for the asset
-  let isVideoPlaying = false;
-  let currentAsset;
-
   if (window.matchMedia('(min-width: 992px)').matches) {
-    //opacity animation for the asset container
+    const objectsContainer = document.querySelector('[data-index="objects"]');
+    const objects = document.querySelectorAll('.objects-index__link');
+    const allAssets = document.querySelectorAll('.objects-index__assets'); //get all images/videos
+    const assetContainer = document.querySelector('.objects-index__asset-wrapper'); //get the wrapper for the asset
+    let isVideoPlaying = false;
+    let currentAsset;
+
+    // opacity animation for the asset container
     objectsContainer.addEventListener('mouseenter', () => {
       let firstMouseMove = true;
 
@@ -1648,128 +1673,143 @@ function objectsIndex() {
 }
 
 function enquireHover() {
-  const hoverEls = document.querySelectorAll('[data-hover="enquire"]');
-        
-  hoverEls.forEach((element) => {
-    let sibling = element.nextElementSibling,
-      hasHover = false, 
-      splitHover, hoverChars;
+  if (window.matchMedia('(min-width: 768px)').matches) { 
+    const hoverEls = document.querySelectorAll('[data-hover="enquire"]');
+          
+    hoverEls.forEach((element) => {
+      let sibling = element.nextElementSibling,
+        hasHover = false, 
+        splitHover, hoverChars;
 
-    if(sibling.classList.contains('enquire-button__hover') && sibling.textContent.trim().length > 0) {
-      hasHover = true,
-      splitHover = new SplitText(sibling, { type: 'words,chars' }),
-      hoverChars = splitHover.chars;
-    }
-
-    let splitInitial = new SplitText(element, { type: 'words,chars' }),
-      initialChars = splitInitial.chars;
-
-    let elementTimeline = gsap.timeline({ paused: true });
-    elementTimeline.addLabel('start');
-
-    element.addEventListener('mouseenter', () => {
-      if (!elementTimeline.isActive()) {
-        elementTimeline.clear().seek('start'); //so it always finishes
-
-        if(hasHover) {
-          element.style.opacity = '0';
-          sibling.style.opacity = '1';
-
-          elementTimeline.from(hoverChars, {
-            duration: 0.01,
-            opacity: 0,
-            ease: 'none',
-            stagger: 0.05,
-          });
-        } else {
-          elementTimeline.from(initialChars, {
-            duration: 0.01,
-            opacity: 0,
-            ease: 'none',
-            stagger: 0.05,
-          });
-        }
-       
-        elementTimeline.play();
+      if(sibling.classList.contains('enquire-button__hover') && sibling.textContent.trim().length > 0) {
+        hasHover = true,
+        splitHover = new SplitText(sibling, { type: 'words,chars' }),
+        hoverChars = splitHover.chars;
       }
-    });
 
-    if(hasHover) {
-      let leaveTimeline = gsap.timeline({ paused: true });
-        leaveTimeline.addLabel('start');
+      let splitInitial = new SplitText(element, { type: 'words,chars' }),
+        initialChars = splitInitial.chars;
 
-      element.addEventListener('mouseleave', () => {
-        if (!leaveTimeline.isActive()) {
-          leaveTimeline.clear().seek('start'); //so it always finishes
-  
-          leaveTimeline.to(sibling, {
-            duration: 0.25,
-            opacity: 0
-          }).to(element, {
-            duration: 0.25,
-            opacity: 1
-          });
-  
-          leaveTimeline.play();
+      let elementTimeline = gsap.timeline({ paused: true });
+      elementTimeline.addLabel('start');
+
+      element.addEventListener('mouseenter', () => {
+        if (!elementTimeline.isActive()) {
+          elementTimeline.clear().seek('start'); //so it always finishes
+
+          if(hasHover) {
+            element.style.opacity = '0';
+            sibling.style.opacity = '1';
+
+            elementTimeline.from(hoverChars, {
+              duration: 0.01,
+              opacity: 0,
+              ease: 'none',
+              stagger: 0.05,
+            });
+          } else {
+            elementTimeline.from(initialChars, {
+              duration: 0.01,
+              opacity: 0,
+              ease: 'none',
+              stagger: 0.05,
+            });
+          }
+        
+          elementTimeline.play();
         }
       });
-    }
-  });
+
+      if(hasHover) {
+        let leaveTimeline = gsap.timeline({ paused: true });
+          leaveTimeline.addLabel('start');
+
+        element.addEventListener('mouseleave', () => {
+          if (!leaveTimeline.isActive()) {
+            leaveTimeline.clear().seek('start'); //so it always finishes
+    
+            leaveTimeline.to(sibling, {
+              duration: 0.25,
+              opacity: 0
+            }).to(element, {
+              duration: 0.25,
+              opacity: 1
+            });
+    
+            leaveTimeline.play();
+          }
+        });
+      }
+    });
+  }
 }
 
+let objetcsSlideshow; //so i can access it on the else, doesn't work inside the function objectsSwiper
+
 function objectsSwiper() {
-  let objectsSwiper;
-
-  objectsSwiper = new Swiper('.objects-carousel__wrapper', {
-    slidesPerView: 'auto',
-    spaceBetween: remToPixels(1.25),
-    freeMode: true,
-    mousewheel: {
-      enabled: true,
-      sensitivity: 4,
-    },
-    on: {
-      init: function () {
-        let slidesInView = [
-          this.slides[0],
-          this.slides[1],
-          this.slides[2]
-        ];
-
-        gsap.to(slidesInView, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: 'blinking-line',
-        });
+  if (window.matchMedia('(min-width: 768px)').matches) {
+    //init swiper only from tablet on 
+    objetcsSlideshow = new Swiper('.objects-carousel__wrapper', {
+      slidesPerView: 'auto',
+      spaceBetween: remToPixels(1.25),
+      freeMode: true,
+      mousewheel: {
+        enabled: true,
+        sensitivity: 4,
       },
-      slideChange: function () {
-        let currentSlide = this.slides[this.activeIndex + 2];
+      on: {
+        init: function () {
+          let slidesInView = [
+            this.slides[0],
+            this.slides[1],
+            this.slides[2]
+          ];
 
-        gsap.to(currentSlide, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.6,
-          ease: 'blinking-line',
-        });
+          gsap.to(slidesInView, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'blinking-line',
+          });
+        },
+        slideChange: function () {
+          let currentSlide = this.slides[this.activeIndex + 2];
+
+          gsap.to(currentSlide, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.6,
+            ease: 'blinking-line',
+          });
+        },
       },
-    },
-  });
+    });
 
-  const breakpointChecker = function () {
-    if (window.innerWidth <= 767) { //below 767px
-      objectsSwiper.destroy(true, true);
-    } else {
-      objectsSwiper.init();
+  } else {
+    if ( objetcsSlideshow !== undefined ) {
+      objetcsSlideshow.destroy( true, true );
     }
-  };
 
-  //keep an eye on viewport size changes
-  window.addEventListener('resize', breakpointChecker);
-
-  //kickstart
-  breakpointChecker();
+    let slides = document.querySelectorAll('.objects-carousel__slide');
+    
+    slides.forEach((el) => {
+      gsap.fromTo(el,
+        { y: 40, opacity: 0, },
+        { 
+          y: 0,
+          duration: 0.8,
+          opacity: 1,
+          ease: 'power4',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top-=40 bottom-=100',
+            end: 'bottom bottom',
+          },
+        }
+      );
+    }); 
+  }
 };
 
 function animateEnquire() {
@@ -1795,30 +1835,32 @@ function animateEnquire() {
 }
   
 function objectsEnquire() {
-  const enquireModel = document.querySelector('.objects-enquire');
-  const emailToCopy = 'hello@yambo.me';
+  if (window.matchMedia('(min-width: 768px)').matches) {
+    const enquireModel = document.querySelector('.objects-enquire');
+    const emailToCopy = 'hello@yambo.me';
 
-  gsap.set(document.querySelector('.enquire-close'), { opacity: 0, y: 5 });
-  
-  document.querySelectorAll('.enquire-button').forEach(function(button) {
-    let availability = button.textContent;
+    gsap.set(document.querySelector('.enquire-close'), { opacity: 0, y: 5 });
+    
+    document.querySelectorAll('.enquire-button').forEach(function(button) {
+      let availability = button.textContent;
 
-    if(availability=='Enquire') {
-      button.addEventListener('click', function() {
-        enquireModel.classList.add('active');
-        animateEnquire();
-        navigator.clipboard.writeText(emailToCopy);
-      });
-    } else if(availability=='On loan') {
-      console.log('on loan')
-    } else {
-      button.style.pointerEvents = 'none';
-    }
-  });
+      if(availability=='Enquire') {
+        button.addEventListener('click', function() {
+          enquireModel.classList.add('active');
+          animateEnquire();
+          navigator.clipboard.writeText(emailToCopy);
+        });
+      } else if(availability=='On loan') {
+        //
+      } else {
+        button.style.pointerEvents = 'none';
+      }
+    });
 
-  document.querySelector('.enquire-close').addEventListener('click', function() {
-    enquireModel.classList.remove('active');
-  });
+    document.querySelector('.enquire-close').addEventListener('click', function() {
+      enquireModel.classList.remove('active');
+    });
+  }
 }
 
 function objectsDownload() {
@@ -1875,9 +1917,9 @@ function aboutVideo() {
 }
 
 function aboutIndexes() {
-  const aboutIndexesSections = document.querySelectorAll('.about-three-col'); // Replace with the class that identifies your sections
-
   if (window.matchMedia('(min-width: 992px)').matches) {
+    const aboutIndexesSections = document.querySelectorAll('.about-three-col'); // Replace with the class that identifies your sections
+
     aboutIndexesSections.forEach(section => {
       let indexCode = section.querySelector('[data-index]').getAttribute('data-index');
       let sectionContainer = document.querySelector(`[data-index=${CSS.escape(indexCode)}]`);
@@ -1916,7 +1958,6 @@ function aboutIndexes() {
           ease: 'blinking-line',
         });
       })
-
 
       //animation for each project line 
       indexes.forEach((el, index) => { //em cada item da lista 
@@ -2003,8 +2044,6 @@ function locationHover() {
 
     function onMouseMove(e) {
       if (isActive) {
-         //hoverImage.style.transform = `translate3d(${e.clientX+20}px, ${e.clientY+20}px, 0)`;
-
         let xPos = (e.clientX - hoverImage.offsetLeft) * 0.1;
         let yPos = (e.clientY - hoverImage.offsetTop) * 0.1;
 
@@ -2036,7 +2075,7 @@ function searchIconHandler(event) {
   resetButton.click();
 }
 
-function searchEnter() { //so it works on refresh
+function searchEnter() { //so the transition animation works on refresh too
   setTimeout(function() {
     document.querySelector('.search-input__wrapper').classList.add('active');  
 
@@ -2273,7 +2312,9 @@ function errorPage() {
     ease: 'none',
     stagger: 0.1,
     onComplete: function() {
-  		document.querySelector('.error-form_input input').focus();
+      if (window.matchMedia('(min-width: 992px)').matches) {
+  		  document.querySelector('.error-form_input input').focus();
+      }
     },
   });
 }
