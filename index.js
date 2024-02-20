@@ -670,7 +670,6 @@ if (!isTouchDevice()) {
 
 /* Remove blinking spans from touch devices */
 if (isTouchDevice()) {
-  console.log('it is touch device')
   let blinkingSpans = document.querySelectorAll('.blinking-span'),
     nestedBlinking = document.querySelectorAll('.nested-blinking-span');
 
@@ -1514,6 +1513,30 @@ function objectsHeroLines() {
               el.classList.add('obj-areas-underline');
             });
           });
+        }
+      });
+    });
+  } else {
+    document.fonts.ready.then(function () {
+      let objectsHeroText = document.querySelector('.objects-hero__text');
+
+      gsap.set(document.querySelector('.objects-hero'), { opacity: 1} )
+
+      const splitLines = new SplitText(objectsHeroText, {
+        type: 'lines',
+        linesClass: 'line line++'
+      });
+    
+      gsap.from(splitLines.lines, {
+        yPercent: 60,
+        opacity: 0,
+        duration: 0.5,
+        stagger: 0.08,
+        ease: 'splitLines',
+        onComplete() {
+          const finsih = gsap.timeline();
+          finsih.to(splitLines.lines, { clearProps: 'all' })
+          gsap.to('.objects-hero__asset-mobile', { opacity: 1, duration: 0.4, ease: 'blinking-line' })
         }
       });
     });
