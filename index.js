@@ -1814,24 +1814,26 @@ function objectsSwiper() {
       objetcsSlideshow.destroy( true, true );
     }
 
-    let slides = document.querySelectorAll('.objects-carousel__slide');
-    
-    slides.forEach((el) => {
-      gsap.fromTo(el,
-        { y: 40, opacity: 0, },
-        { 
-          y: 0,
-          duration: 0.8,
-          opacity: 1,
-          ease: 'power4',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top-=40 bottom-=100',
-            end: 'bottom bottom',
-          },
-        }
-      );
-    }); 
+    setTimeout(() => { //wait for barba transition
+      let slides = document.querySelectorAll('.objects-carousel__slide');
+      
+      slides.forEach((el) => {
+        gsap.fromTo(el,
+          { y: 40, opacity: 0 },
+          { 
+            y: 0,
+            duration: 0.8,
+            opacity: 1,
+            ease: 'power4',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top-=40 bottom-=100',
+              end: 'bottom bottom',
+            },
+          }
+        );
+      }); 
+    }, 1000); 
   }
 };
 
