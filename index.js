@@ -103,6 +103,7 @@ barba.init({
     beforeEnter() {
       homepageHeroLines()
       homepageHeroDesktop()
+      homepageHeroMobile();
       projectsIndex()
     }, 
     afterEnter() {
@@ -110,7 +111,7 @@ barba.init({
       function homepageResize() {
         homepageHeroLines();
         homepageHeroDesktop();
-        //homepageHeroMobile();
+        homepageHeroMobile();
         projectsIndex();
       }
       window.addEventListener('resize', function () {
@@ -942,29 +943,50 @@ function homepageHeroDesktop() {
   }
 }
 
-// function homepageHeroMobile() {
-//   if (window.matchMedia('(max-width: 991px)').matches) {
-//     const clients = document.querySelectorAll('.hero__client-wrapper');
+function homepageHeroMobile() {
+  if (window.matchMedia('(max-width: 991px)').matches) {
+    const clients = document.querySelectorAll('.hero__client-wrapper');
 
-//     let tl = gsap.timeline({
-//       scrollTrigger: {
-//         trigger: '.homepage__hero',
-//         pin: true,
-//         scrub: 2,
-//         anticipatePin: 1,
-//         //markers: true,
-//       }
-//     });
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.homepage__hero',
+        pin: true,
+        scrub: 3,
+        anticipatePin: 1,
+       //markers: true,
+      }
+    });
 
-//     clients.forEach((client, i) => {
-//       let image = client.querySelector('.hero__client-background');
+    clients.forEach((client, i) => {
+      let image = client.querySelector('.hero__client-background');
+      let text = client.querySelector('.hero__client-text');
 
-//       tl.to(image, { duration: 2, opacity: 1 }) // Fade in
-//         .to(image, { duration: 2, opacity: 0 }, "+=2") // Fade out
-//         .to(image, { duration: 0.1, opacity: 0 }); // Ensure the last image is hidden
-//    });
-//   }
-// }
+      tl.to('.hero__client-text', { 
+        opacity: 0.5
+      }).to( image, { 
+        duration: 2,
+        opacity: 1,
+        onStart: function() {
+          if (text.getAttribute('data-hover') === 'light') {
+            text.style.color = '#f8f8f8';
+          }
+        }
+      }).to(image, { 
+        duration: 2, 
+        opacity: 0,
+        onStart: function() {
+          text.style.color = '#070707';
+        }
+      }, "+=2").to(image, { 
+        duration: 0.1, 
+        opacity: 0, 
+        onComplete: function() {
+          gsap.to('.hero__client-text', { opacity: 1 });
+        }
+      }); 
+   });
+  }
+}
 
 function projectsIndex() {
   if (window.matchMedia('(min-width: 992px)').matches) {
