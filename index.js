@@ -2162,6 +2162,8 @@ function search() {
   });
 
   function searchItems() { //função para o search em si
+    document.activeElement.blur();
+    
     document.querySelector('.search').classList.add('searched'); 
     gsap.to('.search-empty', { autoAlpha: 0, duration: 0.3 }); //de cada vez que faço search quero ocultar o empty state
     
