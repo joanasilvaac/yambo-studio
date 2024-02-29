@@ -64,8 +64,6 @@ const cleanGSAP = () => {
 	ScrollTrigger.refresh();
 };
 
-ScrollTrigger.config({ ignoreMobileResize: true });
-
 /* barba configs */
 barba.hooks.beforeEnter(function() { //only things that are common to all pages
   cleanGSAP()
@@ -1070,7 +1068,9 @@ function homepageHeroMobile() {
           gsap.to('.hero__client-text', { opacity: 1 });
         }
       }); 
-   });
+    });
+
+   ScrollTrigger.refresh();
   }
 }
 
