@@ -71,6 +71,20 @@ barba.hooks.beforeEnter(function() { //only things that are common to all pages
   customCursors()
 	currentYear()
 })
+
+barba.hooks.enter(function(data) {
+  let burgerText = data.next.namespace;
+
+  if(data.next.namespace === 'objects-single') {
+    burgerText = 'objects'
+  } else if(data.next.namespace === 'home') {
+    burgerText = 'work'
+  } else if(data.next.namespace === 'projects') {
+    burgerText = 'work'
+  }
+
+  document.querySelector('.navbar__burger-btn').textContent = burgerText;
+});
    
 barba.hooks.after(function(data) {
   resetWebflow(data);
@@ -94,6 +108,8 @@ if(searchLottie) {
   });
 }
   
+mobileBurger()
+
 barba.init({
   prefetchIgnore: true,
   preventRunning: true,
@@ -831,6 +847,75 @@ function hideScrollbar() {
 function showScrollbar() {
   document.body.classList.remove('hide-scrollbar');
 }
+
+/** Moible navbar logic */
+function mobileBurger() {
+  const navbarBurger = document.querySelector('.navbar__burger');
+  const navbarSub = document.querySelector('.navbar__sub');
+  const navbarLinks = document.querySelectorAll('.navbar__link'); 
+  
+  function openNavbar() {
+    gsap.to(navbarSub, {
+      opacity: 1, 
+      y: 0, 
+      duration: 0.7,
+      ease: 'splitLines'
+    });
+    
+    navbarLinks.forEach(link => {
+      gsap.to(link, { 
+        opacity: 1, 
+        duration: 0.25,
+        ease: 'splitLines'
+      });
+    });
+  }
+
+  function closeNavbar() {
+    gsap.to(navbarSub, {
+      opacity: 0, 
+      y: '-50%', 
+      duration: 0.7,
+      ease: 'splitLines'
+    });
+
+    navbarLinks.forEach(link => {
+      gsap.to(link, { 
+        opacity: 0, 
+        duration: 0.25,
+        ease: 'splitLines'
+      });
+    });
+  }
+
+  let navbarOpen = false;
+
+  navbarBurger.addEventListener('click', () => {
+    console.log(navbarSub)
+
+    navbarOpen = !navbarOpen;
+    if (navbarOpen) {
+      openNavbar();
+    } else {
+      closeNavbar();
+    }
+  });
+
+  // close navbar when clicking outside of it
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.navbar')) {
+      closeNavbar();
+      navbarOpen = false;
+    }
+  });
+
+  document.querySelectorAll('.navbar__search, .navbar__link, .navbar__logo').forEach((el) => {
+    el.addEventListener('click', () => {
+      navbarBurger.click()
+    });
+  })
+}
+
   
 /** HOMEPAGE */
 function homepageHeroLines() {
@@ -1548,7 +1633,7 @@ function objectsHeroLines() {
         type: 'lines',
         linesClass: 'line line++'
       });
-    
+  
       gsap.from(splitLines.lines, {
         yPercent: 60,
         opacity: 0,
@@ -1558,7 +1643,7 @@ function objectsHeroLines() {
         onComplete() {
           const finsih = gsap.timeline();
           finsih.to(splitLines.lines, { clearProps: 'all' })
-          gsap.to('.objects-hero__asset-mobile', { opacity: 1, duration: 0.4, ease: 'blinking-line' })
+          gsap.to('.objects-hero__asset-mobile', { opacity: 1, duration: 0.4, ease: 'blinking-line' });
         }
       });
     });
@@ -1840,20 +1925,25 @@ function objectsSwiper() {
       let slides = document.querySelectorAll('.objects-carousel__slide');
       
       slides.forEach((el) => {
-        gsap.fromTo(el,
-          { y: 40, opacity: 0 },
-          { 
-            y: 0,
-            duration: 0.8,
-            opacity: 1,
-            ease: 'power4',
-            scrollTrigger: {
-              trigger: el,
-              start: 'top-=40 bottom-=100',
-              end: 'bottom bottom',
+        if( !el.classList.contains('animated') ) {
+          gsap.fromTo(el,
+            { y: 40, opacity: 0 },
+            { 
+              y: 0,
+              duration: 0.8,
+              opacity: 1,
+              ease: 'power4',
+              scrollTrigger: {
+                trigger: el,
+                start: 'top-=40 bottom-=100',
+                end: 'bottom bottom',
+              },
+              onComplete:function() {
+                el.classList.add('animated')
+              },
             },
-          }
-        );
+          );
+        }
       }); 
     }, 1000); 
   }
