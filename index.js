@@ -64,6 +64,7 @@ const cleanGSAP = () => {
 	ScrollTrigger.refresh();
 };
 
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 /* barba configs */
 barba.hooks.beforeEnter(function() { //only things that are common to all pages
@@ -1038,7 +1039,7 @@ function homepageHeroMobile() {
         pin: true,
         scrub: 3,
         anticipatePin: 1,
-       //markers: true,
+        markers: true,
       }
     });
 
