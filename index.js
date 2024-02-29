@@ -1037,7 +1037,7 @@ function homepageHeroMobile() {
         pin: true,
         scrub: 3,
         anticipatePin: 1,
-        markers: true,
+        //markers: true,
       }
     });
 
