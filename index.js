@@ -692,7 +692,9 @@ if (isTouchDevice()) {
   let allBlinks = [...blinkingSpans].concat([...nestedBlinking]);
 
   allBlinks.forEach(function(el) {
-    el.remove();
+    if (!el.closest('.loading')) {
+      el.remove();
+    }
   })
 }
 
@@ -1041,7 +1043,7 @@ function homepageHeroMobile() {
           trigger: '.homepage__hero',
           pin: true,
           scrub: 3,
-          start: '+=10px',
+          start: '+=2px',
           end: '+=100%',
           anticipatePin: 1,
           //markers: true,
