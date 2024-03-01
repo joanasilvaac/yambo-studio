@@ -893,6 +893,7 @@ function mobileBurger() {
 
   navbarBurger.addEventListener('click', () => {
     navbarOpen = !navbarOpen;
+
     if (navbarOpen) {
       openNavbar();
     } else {
@@ -910,7 +911,9 @@ function mobileBurger() {
 
   document.querySelectorAll('.navbar__search, .navbar__link, .navbar__logo').forEach((el) => {
     el.addEventListener('click', () => {
-      navbarBurger.click()
+      if (navbarOpen != 'false') {
+        closeNavbar();
+      } 
     });
   })
 }
@@ -1407,6 +1410,8 @@ function videoComponent() {
     const coverEl = componentEl.querySelector("[js-vimeo-element='cover']");
     const coverImage = componentEl.querySelector("[js-vimeo-element='media']");
     const timeline =  componentEl.querySelector(".proj-video-timeline");
+
+    iframeEl.setAttribute('src', iframeEl.getAttribute('src') + '&playsinline=0');
 
     let player = new Vimeo.Player(iframeEl);
 
