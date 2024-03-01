@@ -941,7 +941,7 @@ function homepageHeroLines() {
 
     const lines = homepageHeroText.querySelectorAll('.hero__client-wrapper');
     
-    if( !lines.classList.contains('animated') ) {
+    if( !homepageHeroText.classList.contains('animated') ) {
       gsap.from(lines, {
         yPercent: 100,
         duration: 0.6,
@@ -949,7 +949,7 @@ function homepageHeroLines() {
         stagger: 0.05,
         ease: 'splitLines',
         onComplete:function() {
-          lines.classList.add('animated')
+          homepageHeroText.classList.add('animated')
         },
       });
     }
@@ -1034,45 +1034,58 @@ function homepageHeroMobile() {
   if (window.matchMedia('(max-width: 991px)').matches) {
     document.addEventListener('DOMContentLoaded', function() {
       const clients = document.querySelectorAll('.hero__client-wrapper');
+      let activeIndex;
 
-      let tl = gsap.timeline({
+      gsap.timeline({
         scrollTrigger: {
           trigger: '.homepage__hero',
           pin: true,
           scrub: 3,
+          start: '+=10px',
+          end: '+=100%',
           anticipatePin: 1,
-          //markers: true,
-        }
-      });
+          markers: true,
+          onUpdate: self => {
+            activeIndex = Math.round(self.progress * (clients.length - 1));
 
-      clients.forEach((client, i) => {
-        let image = client.querySelector('.hero__client-background');
-        let text = client.querySelector('.hero__client-text');
+            clients.forEach((client, i) => {
+              let image = client.querySelector('.hero__client-background');
+              let text = client.querySelector('.hero__client-text');
 
-        tl.to('.hero__client-text', { 
-          opacity: 0.5
-        }).to( image, { 
-          duration: 2,
-          opacity: 1,
-          onStart: function() {
-            if (text.getAttribute('data-hover') === 'light') {
-              text.style.color = '#f8f8f8';
+              gsap.to(text, { opacity: i === activeIndex ? 1 : 0.5 });
+
+              gsap.to(image, {
+                duration: 0.25,
+                opacity: i === activeIndex ? 1 : 0,
+                onStart: function() {
+                  text.style.color = i === activeIndex && text.getAttribute('data-hover') === 'light' ? '#f8f8f8' : '#070707';
+                }
+              });
+            });
+          },
+          onLeave: (trigger) => {
+            if (trigger.trigger !== '.homepage__hero') {
+              resetStyles();
+            }
+          },
+          onLeaveBack: (trigger) => {
+            if (trigger.trigger !== '.homepage__hero') {
+              resetStyles();
             }
           }
-        }).to(image, { 
-          duration: 2, 
-          opacity: 0,
-          onStart: function() {
-            text.style.color = '#070707';
-          }
-        }, "+=2").to(image, { 
-          duration: 0.1, 
-          opacity: 0, 
-          onComplete: function() {
-            gsap.to('.hero__client-text', { opacity: 1 });
-          }
-        }); 
+        }
       });
+      
+      function resetStyles() {
+        clients.forEach((client) => {
+          let image = client.querySelector('.hero__client-background');
+          let text = client.querySelector('.hero__client-text');
+          gsap.to(image, { opacity: 0 });
+          text.style.color = '#070707';
+          gsap.to(text, { opacity: 1 });
+        });
+        activeIndex = -1;
+      }
     });
   }
 }
