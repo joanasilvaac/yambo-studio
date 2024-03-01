@@ -940,14 +940,19 @@ function homepageHeroLines() {
     gsap.set(homepageHeroText, { opacity: 1} )
 
     const lines = homepageHeroText.querySelectorAll('.hero__client-wrapper');
-
-    gsap.from(lines, {
-      yPercent: 100,
-      duration: 0.6,
-      opacity: 0,
-      stagger: 0.05,
-      ease: 'splitLines',
-    });
+    
+    if( !lines.classList.contains('animated') ) {
+      gsap.from(lines, {
+        yPercent: 100,
+        duration: 0.6,
+        opacity: 0,
+        stagger: 0.05,
+        ease: 'splitLines',
+        onComplete:function() {
+          lines.classList.add('animated')
+        },
+      });
+    }
   }
 }
 
