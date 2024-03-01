@@ -1044,7 +1044,7 @@ function homepageHeroMobile() {
           start: '+=10px',
           end: '+=100%',
           anticipatePin: 1,
-          markers: true,
+          //markers: true,
           onUpdate: self => {
             activeIndex = Math.round(self.progress * (clients.length - 1));
 
