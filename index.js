@@ -184,7 +184,7 @@ barba.init({
     beforeEnter() {
       iframePoster()
       objectsDownload()
-      carouselAnimation()
+      videoComponent()
     }, 
     afterEnter() {
       objectsSwiper()
