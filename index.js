@@ -167,9 +167,6 @@ barba.init({
       objectsEnquire()
     }, 
     afterEnter() {
-      enquireHover();
-      objectsEnquire();
-
       //flag resize
       function objectsResize() {
         objectsHeroLines();
@@ -193,8 +190,6 @@ barba.init({
     }, 
     afterEnter() {
       objectsSwiper()
-      enquireHover();
-      objectsEnquire();
 
       //flag resize
       function objectSingleResize() {
