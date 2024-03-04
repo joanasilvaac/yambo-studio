@@ -173,7 +173,7 @@ barba.init({
         objectsHeroDesktop();
         objectsIndex();
         enquireHover();
-        objectsEnquire()
+        objectsEnquire();
       }
       window.addEventListener('resize', function () {
         debounce(objectsResize, 1000); // 1 second delay after resize
@@ -185,6 +185,8 @@ barba.init({
       iframePoster()
       objectsDownload()
       videoComponent()
+      enquireHover()
+      objectsEnquire()
     }, 
     afterEnter() {
       objectsSwiper()
@@ -192,6 +194,8 @@ barba.init({
       //flag resize
       function objectSingleResize() {
         objectsSwiper();
+        enquireHover();
+        objectsEnquire();
       }
       window.addEventListener('resize', function () {
         debounce(objectSingleResize, 1000); // 1 second delay after resize
