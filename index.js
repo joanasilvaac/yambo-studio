@@ -2012,7 +2012,7 @@ function objectsEnquire() {
 
     gsap.set(document.querySelector('.enquire-close'), { opacity: 0, y: 5 });
     
-    document.querySelectorAll('[data-enquire]').forEach(function(button) {
+    document.querySelectorAll('.enquire-button').forEach(function(button) {
       let availability = button.textContent;
 
       console.log('teste');
