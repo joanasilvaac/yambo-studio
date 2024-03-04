@@ -185,6 +185,7 @@ barba.init({
       iframePoster()
       objectsDownload()
       videoComponent()
+      enquireHover()
       objectsEnquire()
     }, 
     afterEnter() {
@@ -193,6 +194,7 @@ barba.init({
       //flag resize
       function objectSingleResize() {
         objectsSwiper();
+        enquireHover();
         objectsEnquire();
       }
       window.addEventListener('resize', function () {
