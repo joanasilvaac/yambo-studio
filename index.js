@@ -185,7 +185,6 @@ barba.init({
       iframePoster()
       objectsDownload()
       videoComponent()
-      enquireHover()
       objectsEnquire()
     }, 
     afterEnter() {
@@ -194,7 +193,6 @@ barba.init({
       //flag resize
       function objectSingleResize() {
         objectsSwiper();
-        enquireHover();
         objectsEnquire();
       }
       window.addEventListener('resize', function () {
@@ -2016,6 +2014,8 @@ function objectsEnquire() {
     
     document.querySelectorAll('[data-enquire]').forEach(function(button) {
       let availability = button.textContent;
+
+      console.log('teste');
 
       if(availability=='Enquire') {
         button.addEventListener('click', function() {
