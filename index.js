@@ -2012,12 +2012,12 @@ function objectsEnquire() {
 
     gsap.set(document.querySelector('.enquire-close'), { opacity: 0, y: 5 });
     
-    document.querySelectorAll('.enquire-button').forEach(function(button) {
+    document.querySelectorAll('[data-enquire]').forEach(function(button) {
       let availability = button.textContent;
 
       if(availability=='Enquire') {
         button.addEventListener('click', function() {
-          //enquireModal.classList.add('active');
+          enquireModal.classList.add('active');
           animateEnquire();
           navigator.clipboard.writeText(emailToCopy);
         });
