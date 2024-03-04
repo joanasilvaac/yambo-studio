@@ -2009,17 +2009,17 @@ function animateEnquire() {
   
 function objectsEnquire() {
   if (window.matchMedia('(min-width: 768px)').matches) {
-    const enquireModel = document.querySelector('.objects-enquire');
+    const enquireModal = document.querySelector('.objects-enquire');
     const emailToCopy = 'hello@yambo.me';
 
     gsap.set(document.querySelector('.enquire-close'), { opacity: 0, y: 5 });
     
-    document.querySelectorAll('.enquire-button').forEach(function(button) {
+    document.querySelectorAll('[data-enquire]').forEach(function(button) {
       let availability = button.textContent;
 
       if(availability=='Enquire') {
         button.addEventListener('click', function() {
-          enquireModel.classList.add('active');
+          enquireModal.classList.add('active');
           animateEnquire();
           navigator.clipboard.writeText(emailToCopy);
         });
@@ -2031,7 +2031,7 @@ function objectsEnquire() {
     });
 
     document.querySelector('.enquire-close').addEventListener('click', function() {
-      enquireModel.classList.remove('active');
+      enquireModal.classList.remove('active');
     });
   }
 }
