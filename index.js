@@ -2017,9 +2017,7 @@ function objectsEnquire() {
 
       if(availability=='Enquire') {
         button.addEventListener('click', function() {
-          console.log('teste');
-          
-          enquireModal.classList.add('active');
+          //enquireModal.classList.add('active');
           animateEnquire();
           navigator.clipboard.writeText(emailToCopy);
         });
