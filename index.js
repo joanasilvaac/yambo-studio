@@ -2015,10 +2015,10 @@ function objectsEnquire() {
     document.querySelectorAll('.enquire-button').forEach(function(button) {
       let availability = button.textContent;
 
-      console.log('teste');
-
       if(availability=='Enquire') {
         button.addEventListener('click', function() {
+          console.log('teste');
+          
           enquireModal.classList.add('active');
           animateEnquire();
           navigator.clipboard.writeText(emailToCopy);
