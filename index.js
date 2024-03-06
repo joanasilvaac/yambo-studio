@@ -1859,55 +1859,58 @@ function objectsIndex() {
 
 function enquireHover() {
   if (window.matchMedia('(min-width: 768px)').matches) { 
-    const hoverEls = document.querySelectorAll('.enquire-button');
-          
-    hoverEls.forEach((element) => {
-      var enquireButtonEl = element,
-          enquireHoverEl = enquireButtonEl.nextSibling,
-          splitInitial = new SplitText(enquireButtonEl, { type: 'words,chars' }),
-          initialChars = splitInitial.chars,
-          splitHover = new SplitText(enquireHoverEl, { type: 'words,chars' }),
-          hoverChars = splitHover.chars,
-          hoverTimeline = gsap.timeline({ paused: true }),
-          leaveTimeline = gsap.timeline({ paused: true });
-
-      element.addEventListener('mouseenter', () => {
-
-        hoverTimeline.addLabel('start');
-        hoverTimeline.clear().seek('start');
-
-        if(!enquireHoverEl.classList.contains('w-condition-invisible') && !hoverTimeline.isActive()){
-          enquireButtonEl.style.opacity = '0';
-          enquireHoverEl.style.opacity = '1';
-
-          hoverTimeline.from(hoverChars, {
-            duration: 0.01,
-            opacity: 0,
-            ease: 'none',
-            stagger: 0.05,
-          });
-        } else {
-          hoverTimeline.from(initialChars, {
-            duration: 0.01,
-            opacity: 0,
-            ease: 'none',
-            stagger: 0.05,
-          });
+    
+    document.querySelectorAll('.enquire-button').forEach(button => {
+      button.addEventListener('mouseenter', function(event) {
+        let hoverText = this.getAttribute('data-text-hover');
+        if (!hoverText) {
+          hoverText = this.getAttribute('data-text-original');
         }
-
-        hoverTimeline.play();
         
-      });
-
-      element.addEventListener('mouseleave', () => {
-
-        if (!leaveTimeline.isActive()) {
-          gsap.to(enquireHoverEl, {opacity:0, duration:0.25});
-          gsap.to(enquireButtonEl, {opacity:1, duration:0.25, delay:0.25});
+        if (!this.classList.contains('is-hover')) {
+          this.style.width = this.offsetWidth + 'px';
+          this.classList.add('is-hover');
+          
+          gsap.to(this, {
+            opacity: 0,
+            duration: 0.3,
+            onComplete: function() {
+              button.textContent = hoverText;
+              
+              let splitHoverText = new SplitText(button, { type: 'words,chars' });
+              gsap.set(splitHoverText.chars, { opacity: 0 });
+              
+              gsap.to(splitHoverText.chars, {
+                opacity: 1,
+                stagger: 0.05,
+                duration: 0.01,
+                ease: 'none'
+              });
+              
+              gsap.to(button, { opacity: 1, duration: 0.3 });
+            }
+          });
         }
-
+      });
+      
+      button.addEventListener('mouseleave', function(event) {
+        let originalText = this.getAttribute('data-text-original');
+        
+        if (this.classList.contains('is-hover')) {
+          gsap.to(this, {
+            opacity: 0,
+            duration: 0.3,
+            onComplete: function() {
+              button.textContent = originalText;
+              gsap.to(button, { opacity: 1, duration: 0.3 });
+            }
+          });
+          this.classList.remove('is-hover');
+        }
       });
     });
+    
+
   }
 }
 
@@ -2013,10 +2016,6 @@ function objectsEnquire() {
 
           navigator.clipboard.writeText(emailToCopy);
         });
-      } else if(availability=='On loan') {
-        //
-      } else {
-        button.style.pointerEvents = 'none';
       }
     });
 
