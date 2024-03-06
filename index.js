@@ -1664,9 +1664,9 @@ function objectsHeroLines() {
         stagger: 0.08,
         ease: 'splitLines',
         onComplete() {
-          const finsih = gsap.timeline();
+          const finish = gsap.timeline();
       
-          finsih.to(splitLines.lines, { clearProps: 'all' })
+          finish.to(splitLines.lines, { clearProps: 'all' })
           .to(objectsHeroText.style, { color: '#dedede', mixBlendMode: 'difference' }, 0) // synchronize color and mixBlendMode
           .call(() => {
             document.querySelectorAll('.objects-index__text--areas').forEach(function(el) {
@@ -1694,8 +1694,8 @@ function objectsHeroLines() {
         stagger: 0.08,
         ease: 'splitLines',
         onComplete() {
-          const finsih = gsap.timeline();
-          finsih.to(splitLines.lines, { clearProps: 'all' })
+          const finish = gsap.timeline();
+          finish.to(splitLines.lines, { clearProps: 'all' })
           gsap.to('.objects-hero__asset-mobile', { opacity: 1, duration: 0.4, ease: 'blinking-line' });
         }
       });
@@ -1758,7 +1758,6 @@ function objectsIndex() {
     const allAssets = document.querySelectorAll('.objects-index__assets'); //get all images/videos
     const assetContainer = document.querySelector('.objects-index__asset-wrapper'); //get the wrapper for the asset
     let isVideoPlaying = false;
-    let currentAsset;
 
     // opacity animation for the asset container
     objectsContainer.addEventListener('mouseenter', () => {
@@ -1797,7 +1796,7 @@ function objectsIndex() {
       });
 
       el.addEventListener('mouseenter', () => { //no mouseenter
-        currentAsset = allAssets[index];
+        let currentAsset = allAssets[index];
         
         let iframe = currentAsset.querySelector('iframe');
 
@@ -1809,6 +1808,7 @@ function objectsIndex() {
           gsap.to(currentAsset, {
             scale: 1.05,  
             duration: 0.5,
+            autoAlpha: 1,
             ease: 'asset-index',
           });
 
@@ -1835,6 +1835,8 @@ function objectsIndex() {
       });
 
       el.addEventListener('mouseleave', () => {
+        let currentAsset = allAssets[index];
+
         let iframe = currentAsset.querySelector('iframe');
 
         currentAsset.style.zIndex = 0;
@@ -1869,6 +1871,7 @@ function enquireHover() {
         
         if (!this.classList.contains('is-hover')) {
           this.style.width = this.offsetWidth + 'px';
+          this.style.height = this.offsetHeight + 'px';
           this.classList.add('is-hover');
           
           gsap.to(this, {
