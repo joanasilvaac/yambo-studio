@@ -167,6 +167,8 @@ barba.init({
       objectsEnquire()
     }, 
     afterEnter() {
+      objectsEnquire()
+      
       //flag resize
       function objectsResize() {
         objectsHeroLines();
@@ -740,30 +742,38 @@ function customCursors() {
   const cursors = document.querySelector('.cursor-wrapper');
   const customCursors = document.querySelectorAll('[data-cursor]');
 
-  document.querySelectorAll('a, button, [data-cursor-hover="true"], .proj-16x9-video, .proj-1x1-video, .proj-4x5-video, .proj-9x16-video, .proj-wide-video,  [data-animation-type="spline"]').forEach(element => {
-    element.addEventListener('mouseenter', () => {
-      cursors.style.opacity = '0';
-    });
-  
-    element.addEventListener('mouseleave', () => {
-      cursors.style.opacity = '1';
-    });
-
-    /* so elements inside don't trigger the cursor */
-    element.querySelectorAll('*').forEach(descendant => {
-      descendant.addEventListener('mouseenter', () => {
-        cursors.style.opacity = '0';
-      });
-      descendant.addEventListener('mouseleave', () => {
-        cursors.style.opacity = '1';
-      });
-    });
-  });
   
   if (!isTouchDevice()) {
     // move the cursors with the mouse position
-    document.addEventListener('pointermove', (e) => {
-      cursors.style.transform = `translate(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%))`
+    let isPointer = false;
+    let lastKnownMousePosition = { x: 0, y: 0 };
+
+    document.addEventListener('mousemove', (e) => {
+      lastKnownMousePosition.x = e.clientX;
+      lastKnownMousePosition.y = e.clientY;
+
+      cursors.style.transform = `translate(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%))`;
+
+      updateCursorVisibility(e.target);
+    });
+
+    lenis.on('scroll', () => {
+      const elementUnderCursor = document.elementFromPoint(lastKnownMousePosition.x, lastKnownMousePosition.y);
+      updateCursorVisibility(elementUnderCursor);
+    }, true);
+
+    function updateCursorVisibility(element) {
+      if (window.getComputedStyle(element).cursor === 'pointer') {
+        isPointer = true;
+        cursors.style.opacity = '0';
+      } else if (!isPointer) {
+        cursors.style.opacity = '1';
+      }
+    }
+
+    document.addEventListener('mouseout', () => {
+      isPointer = false;
+      cursors.style.opacity = '1';
     });
   
     // check if a custom cursor is needed
@@ -895,29 +905,38 @@ function mobileBurger() {
 
   let navbarOpen = false;
 
-  navbarBurger.addEventListener('click', () => {
-    navbarOpen = !navbarOpen;
-
-    if (navbarOpen) {
-      openNavbar();
-    } else {
-      closeNavbar();
-    }
-  });
+  if(navbarBurger) {
+    navbarBurger.addEventListener('click', () => {
+      
+      if (window.matchMedia('(max-width: 991px)').matches) {
+        navbarOpen = !navbarOpen;
+        
+        if (navbarOpen) {
+          openNavbar();
+        } else {
+          closeNavbar();
+        }
+      }
+    });
+  }
 
   // close navbar when clicking outside of it
   document.addEventListener('click', (event) => {
-    if (!event.target.closest('.navbar')) {
-      closeNavbar();
-      navbarOpen = false;
+    if (window.matchMedia('(max-width: 991px)').matches) {
+      if (!event.target.closest('.navbar')) {
+        closeNavbar();
+        navbarOpen = false;
+      }
     }
   });
 
   document.querySelectorAll('.navbar__search, .navbar__link, .navbar__logo').forEach((el) => {
     el.addEventListener('click', () => {
-      if (navbarOpen != 'false') {
-        closeNavbar();
-      } 
+      if (window.matchMedia('(max-width: 991px)').matches) {
+        if (navbarOpen != 'false') {
+          closeNavbar();
+        } 
+      }
     });
   })
 }
@@ -1840,72 +1859,54 @@ function objectsIndex() {
 
 function enquireHover() {
   if (window.matchMedia('(min-width: 768px)').matches) { 
-    const hoverEls = document.querySelectorAll('[data-hover="enquire"]');
+    const hoverEls = document.querySelectorAll('.enquire-button');
           
     hoverEls.forEach((element) => {
-      let sibling = element.nextElementSibling,
-        hasHover = false, 
-        splitHover, hoverChars;
-
-      if(sibling.classList.contains('enquire-button__hover') && sibling.textContent.trim().length > 0) {
-        hasHover = true,
-        splitHover = new SplitText(sibling, { type: 'words,chars' }),
-        hoverChars = splitHover.chars;
-      }
-
-      let splitInitial = new SplitText(element, { type: 'words,chars' }),
-        initialChars = splitInitial.chars;
-
-      let elementTimeline = gsap.timeline({ paused: true });
-      elementTimeline.addLabel('start');
+      var enquireButtonEl = element,
+          enquireHoverEl = enquireButtonEl.nextSibling,
+          splitInitial = new SplitText(enquireButtonEl, { type: 'words,chars' }),
+          initialChars = splitInitial.chars,
+          splitHover = new SplitText(enquireHoverEl, { type: 'words,chars' }),
+          hoverChars = splitHover.chars,
+          hoverTimeline = gsap.timeline({ paused: true }),
+          leaveTimeline = gsap.timeline({ paused: true });
 
       element.addEventListener('mouseenter', () => {
-        if (!elementTimeline.isActive()) {
-          elementTimeline.clear().seek('start'); //so it always finishes
 
-          if(hasHover) {
-            element.style.opacity = '0';
-            sibling.style.opacity = '1';
+        hoverTimeline.addLabel('start');
+        hoverTimeline.clear().seek('start');
 
-            elementTimeline.from(hoverChars, {
-              duration: 0.01,
-              opacity: 0,
-              ease: 'none',
-              stagger: 0.05,
-            });
-          } else {
-            elementTimeline.from(initialChars, {
-              duration: 0.01,
-              opacity: 0,
-              ease: 'none',
-              stagger: 0.05,
-            });
-          }
-        
-          elementTimeline.play();
+        if(!enquireHoverEl.classList.contains('w-condition-invisible') && !hoverTimeline.isActive()){
+          enquireButtonEl.style.opacity = '0';
+          enquireHoverEl.style.opacity = '1';
+
+          hoverTimeline.from(hoverChars, {
+            duration: 0.01,
+            opacity: 0,
+            ease: 'none',
+            stagger: 0.05,
+          });
+        } else {
+          hoverTimeline.from(initialChars, {
+            duration: 0.01,
+            opacity: 0,
+            ease: 'none',
+            stagger: 0.05,
+          });
         }
+
+        hoverTimeline.play();
+        
       });
 
-      if(hasHover) {
-        let leaveTimeline = gsap.timeline({ paused: true });
-          leaveTimeline.addLabel('start');
+      element.addEventListener('mouseleave', () => {
 
-        element.addEventListener('mouseleave', () => {
-          if (!leaveTimeline.isActive()) {
-            leaveTimeline.clear().seek('start'); //so it always finishes
-    
-            leaveTimeline.to(sibling, {
-              duration: 0.25,
-              opacity: 0
-            }).to(element, {
-              duration: 0.25,
-              opacity: 1
-            });
-    
-            leaveTimeline.play();
-          }
-        });
-      }
+        if (!leaveTimeline.isActive()) {
+          gsap.to(enquireHoverEl, {opacity:0, duration:0.25});
+          gsap.to(enquireButtonEl, {opacity:1, duration:0.25, delay:0.25});
+        }
+
+      });
     });
   }
 }
@@ -1984,32 +1985,9 @@ function objectsSwiper() {
     }, 1000); 
   }
 };
-
-function animateEnquire() {
-  let enquireTl = gsap.timeline(),
-    enquireLines = document.querySelectorAll('.enquire-info p'), 
-    enquireClose = document.querySelector('.enquire-close');
-
-  enquireTl.from(enquireLines, {
-    duration: 0.4,
-    display: 'none', 
-    ease: 'none',
-    stagger: 0.1, 
-    delay: 0.3,
-  }).fromTo(enquireClose, {
-    duration: 0.4,
-    y: 20,
-    opacity: 0,
-    ease: 'power1.inOut',
-  }, {
-    opacity: 1,
-    y: 0,
-  });
-}
   
 function objectsEnquire() {
   if (window.matchMedia('(min-width: 768px)').matches) {
-    const enquireModal = document.querySelector('.objects-enquire');
     const emailToCopy = 'hello@yambo.me';
 
     gsap.set(document.querySelector('.enquire-close'), { opacity: 0, y: 5 });
@@ -2019,8 +1997,20 @@ function objectsEnquire() {
 
       if(availability=='Enquire') {
         button.addEventListener('click', function() {
-          enquireModal.classList.add('active');
-          animateEnquire();
+          document.querySelector('.objects-enquire').classList.add('active');
+
+          gsap.fromTo('.enquire-info__line', { display: 'none' }, {duration: 0.4, display: 'block', stagger: 0.3});
+      
+          gsap.fromTo('.enquire-close', {
+            duration: 0.4,
+            y: 20,
+            opacity: 0,
+            ease: 'power1.inOut',
+          }, {
+            opacity: 1,
+            y: 0,
+          });
+
           navigator.clipboard.writeText(emailToCopy);
         });
       } else if(availability=='On loan') {
@@ -2030,8 +2020,10 @@ function objectsEnquire() {
       }
     });
 
-    document.querySelector('.enquire-close').addEventListener('click', function() {
-      enquireModal.classList.remove('active');
+    document.querySelectorAll('.enquire-close').forEach(function(button) {
+      button.addEventListener('click', function() {        
+        this.closest('.objects-enquire').classList.remove('active');
+      });
     });
   }
 }
