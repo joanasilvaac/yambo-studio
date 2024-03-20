@@ -1533,6 +1533,9 @@ function projectSrollAnimations() {
     const sections = [
       '.proj-text-intro',
       '.proj-text-caption',
+      '.proj-text-col6',
+      '.proj-text-col8',
+      '.proj-text-block',
       '.proj-credits',
       '.proj-credits-inline',
       '.proj-16x9-col6',
