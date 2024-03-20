@@ -943,25 +943,30 @@ function mobileBurger() {
 
   
 /** HOMEPAGE */
+let homepageHeroSplitLines;
 function homepageHeroLines() {
   const homepageHeroText = document.querySelector('.hero__clients-collection');
 
   if (window.matchMedia('(min-width: 992px)').matches) {
     gsap.set(homepageHeroText, { opacity: 1} )
 
-    const splitLines = new SplitText(homepageHeroText, {
+    if(homepageHeroSplitLines) {
+      homepageHeroSplitLines.revert();
+    }
+
+    homepageHeroSplitLines = new SplitText(homepageHeroText, {
       type: 'lines',
       linesClass: 'line line++'
     });
 
-    gsap.from(splitLines.lines, {
+    gsap.from(homepageHeroSplitLines.lines, {
       yPercent: 100,
       duration: 0.6,
       opacity: 0,
       stagger: 0.1,
       ease: 'splitLines',
       onComplete() {
-        gsap.set(splitLines.lines, { clearProps: 'all' });
+        gsap.set(homepageHeroSplitLines.lines, { clearProps: 'all' });
       }
     });
   } else {
@@ -1621,7 +1626,7 @@ function projectSrollAnimations() {
             trigger: el,
             start: 'top-=40 bottom-=200',
             end: 'bottom bottom',
-          },
+          }
         });
 
         timeline.from(splitLines.lines, { // lines animation
@@ -1629,7 +1634,7 @@ function projectSrollAnimations() {
           duration: 1,
           opacity: 0,
           stagger: 0.1,
-          ease: 'power4',
+          ease: 'power4'
         });
 
         if (blockLink) { // check if blockLink exists and add its animation to the timeline
@@ -2106,7 +2111,6 @@ function aboutIndexes() {
       const allAssets = section.querySelectorAll('.about-three-col__assets'); //get all images/videos
       const assetContainer = section.querySelector('.about-three-col__asset-wrapper'); //get the wrapper for the asset
       let isVideoPlaying = false;
-      let currentAsset;
 
       //opacity animation for the asset container
       sectionContainer.addEventListener('mouseenter', () => {
@@ -2140,7 +2144,7 @@ function aboutIndexes() {
       //animation for each project line 
       indexes.forEach((el, index) => { //em cada item da lista 
         el.addEventListener('mouseenter', () => { //no mouseenter
-          currentAsset = allAssets[index];
+          let currentAsset = allAssets[index];
 
           let iframe = currentAsset.querySelector('iframe');
 
@@ -2152,6 +2156,7 @@ function aboutIndexes() {
             gsap.to(currentAsset, {
               scale: 1.05,  
               duration: 0.5,
+              autoAlpha: 1,
               ease: 'asset-index',
             });
 
@@ -2178,6 +2183,8 @@ function aboutIndexes() {
         });
 
         el.addEventListener('mouseleave', () => {
+          let currentAsset = allAssets[index];
+
           let iframe = currentAsset.querySelector('iframe');
 
           currentAsset.style.zIndex = 0;
