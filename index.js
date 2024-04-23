@@ -233,6 +233,8 @@ barba.init({
     beforeEnter() {
       errorPage()
     }
+  },{
+    namespace: 'privacy'
   }],
   transitions: [
   {
