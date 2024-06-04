@@ -1953,7 +1953,8 @@ function objectsSwiper() {
           let slidesInView = [
             this.slides[0],
             this.slides[1],
-            this.slides[2]
+            this.slides[2],
+            this.slides[3]
           ];
 
           gsap.to(slidesInView, {
