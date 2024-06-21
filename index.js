@@ -847,8 +847,10 @@ function customCursors() {
 function iframePoster() {
     document.querySelectorAll("[data-vimeo-poster='true']").forEach(function(componentEl) {
 	    const iframeEl = componentEl.querySelector('iframe');
-	    let dataSrc = iframeEl.getAttribute('data-src');
-	    iframeEl.setAttribute('src', dataSrc);
+	    if (iframeEl.hasAttribute('data-src') && !iframeEl.hasAttribute('src')) {
+	      let dataSrc = iframeEl.getAttribute('data-src');
+	      iframeEl.setAttribute('src', dataSrc);
+	    }
 	    let player = new Vimeo.Player(iframeEl);
 	
 	    player.on('play', function() {
