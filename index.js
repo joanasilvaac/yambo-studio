@@ -849,7 +849,9 @@ function iframePoster() {
 	    const iframeEl = componentEl.querySelector('iframe');
 	    if (iframeEl.hasAttribute('data-src') && !iframeEl.hasAttribute('src')) {
 	      let dataSrc = iframeEl.getAttribute('data-src');
-	      iframeEl.setAttribute('src', dataSrc);
+	      if(dataSrc != '') {
+		  iframeEl.setAttribute('src', dataSrc);    
+	      }
 	    }
 	    let player = new Vimeo.Player(iframeEl);
 	
