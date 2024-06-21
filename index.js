@@ -202,6 +202,13 @@ barba.init({
       window.addEventListener('resize', function () {
         debounce(objectSingleResize, 1000); // 1 second delay after resize
       });
+
+      document.querySelectorAll('[data-src]').forEach(function(element) {
+      	var dataSrc = element.getAttribute('data-src');
+	if(dataSrc != ''){
+	  element.setAttribute('src', dataSrc);
+	}
+      });
     }
   }, {
     namespace: 'about',
