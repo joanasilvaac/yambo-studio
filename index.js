@@ -845,14 +845,16 @@ function customCursors() {
 }
 
 function iframePoster() {
-	document.querySelectorAll("[data-vimeo-poster='true']").forEach(function(componentEl) {
-    const iframeEl = componentEl.querySelector('iframe');
-    let player = new Vimeo.Player(iframeEl);
-
-    player.on('play', function() {
-      iframeEl.style.opacity = 1;
-    });
-	})
+    document.querySelectorAll("[data-vimeo-poster='true']").forEach(function(componentEl) {
+	    const iframeEl = componentEl.querySelector('iframe');
+	    let dataSrc = iframeEl.getAttribute('data-src');
+	    iframeEl.setAttribute('src', dataSrc);
+	    let player = new Vimeo.Player(iframeEl);
+	
+	    player.on('play', function() {
+	      iframeEl.style.opacity = 1;
+	    });
+    })
 }
 
 function currentYear() {
