@@ -192,6 +192,7 @@ barba.init({
     }, 
     afterEnter() {
       objectsSwiper()
+      objectsEnquire()
 
       //flag resize
       function objectSingleResize() {
